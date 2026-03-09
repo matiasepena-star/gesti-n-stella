@@ -1,1 +1,85 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+from datetime import datetime
+import os
 
+# Archivo para almacenar los datos
+DATA_FILE = 'gestion_negocio.csv'
+
+# Función para cargar ventas y gastos diarios
+def cargar_datos():
+    fecha = datetime.now().strftime('%Y-%m-%d')
+    ventas = float(input("Ingrese las ventas del día (en ARS): "))
+    gastos = float(input("Ingrese los gastos del día (en ARS): "))
+    
+    # Crear DataFrame con los nuevos datos
+    nuevo_registro = pd.DataFrame({'Fecha': [fecha], 'Ventas': [ventas], 'Gastos': [gastos]})
+    
+    # Si el archivo existe, cargar y agregar; si no, crear nuevo
+    if os.path.exists(DATA_FILE):
+        df = pd.read_csv(DATA_FILE)
+        df = pd.concat([df, nuevo_registro], ignore_index=True)
+    else:
+        df = nuevo_registro
+    
+    df.to_csv(DATA_FILE, index=False)
+    print(f"Datos cargados para {fecha}: Ventas {ventas} ARS, Gastos {gastos} ARS")
+
+# Función para mostrar el dashboard
+def mostrar_dashboard():
+    if not os.path.exists(DATA_FILE):
+        print("No hay datos disponibles. Cargue datos primero.")
+        return
+    
+    df = pd.read_csv(DATA_FILE)
+    df['Fecha'] = pd.to_datetime(df['Fecha'])
+    df = df.sort_values('Fecha')
+    
+    # Cálculos
+    total_ventas = df['Ventas'].sum()
+    total_gastos = df['Gastos'].sum()
+    ganancia_neta = total_ventas - total_gastos
+    df['Ganancia Diaria'] = df['Ventas'] - df['Gastos']
+    
+    print("\n--- Dashboard de Gestión ---")
+    print(f"Total Ventas: {total_ventas:.2f} ARS")
+    print(f"Total Gastos: {total_gastos:.2f} ARS")
+    print(f"Ganancia Neta: {ganancia_neta:.2f} ARS")
+    print("\nRegistros Diarios:")
+    print(df)
+    
+    # Gráfico
+    plt.figure(figsize=(10, 5))
+    plt.plot(df['Fecha'], df['Ventas'], label='Ventas', marker='o')
+    plt.plot(df['Fecha'], df['Gastos'], label='Gastos', marker='o')
+    plt.plot(df['Fecha'], df['Ganancia Diaria'], label='Ganancia Diaria', marker='o')
+    plt.xlabel('Fecha')
+    plt.ylabel('Monto (ARS)')
+    plt.title('Ventas, Gastos y Ganancias Diarias')
+    plt.legend()
+    plt.grid(True)
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+
+# Menú principal
+def menu():
+    while True:
+        print("\nSistema de Gestión para Negocio")
+        print("1. Cargar Ventas y Gastos Diarios")
+        print("2. Mostrar Dashboard")
+        print("3. Salir")
+        opcion = input("Seleccione una opción: ")
+        
+        if opcion == '1':
+            cargar_datos()
+        elif opcion == '2':
+            mostrar_dashboard()
+        elif opcion == '3':
+            break
+        else:
+            print("Opción inválida. Intente nuevamente.")
+
+# Ejecutar el menú
+if __name__ == "__main__":
+    menu()
