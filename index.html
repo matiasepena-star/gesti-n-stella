@@ -3,94 +3,290 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Business App Pro</title>
+    <title>Business OS | Manager</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .active-btn { transform: translateY(2px); box-shadow: inset 0 3px 5px rgba(0,0,0,0.2); }
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        input, select { border: 1px solid #e2e8f0; padding: 8px; border-radius: 6px; }
+    </style>
 </head>
-<body class="bg-gray-100 font-sans">
-    <nav class="bg-blue-600 p-4 text-white shadow-lg">
-        <h1 class="text-xl font-bold">🚀 Mi Negocio App</h1>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+
+    <nav class="bg-indigo-700 text-white p-4 sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="font-bold text-xl flex items-center gap-2"><i class="fas fa-wallet"></i> BusinessOS</h1>
+            <div class="flex gap-2">
+                <button onclick="exportData()" class="bg-indigo-500 px-3 py-1 rounded text-sm hover:bg-indigo-400 active:scale-95 transition"><i class="fas fa-download"></i></button>
+                <button onclick="document.getElementById('importFile').click()" class="bg-indigo-500 px-3 py-1 rounded text-sm hover:bg-indigo-400 active:scale-95 transition"><i class="fas fa-upload"></i></button>
+                <input type="file" id="importFile" class="hidden" onchange="importData(event)">
+            </div>
+        </div>
     </nav>
 
-    <div class="p-4 max-w-4xl mx-auto">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div class="bg-white p-4 rounded-lg shadow border-l-4 border-green-500">
-                <p class="text-gray-500 text-sm">Ingresos</p>
-                <h2 id="totalVentas" class="text-2xl font-bold text-green-600">$0</h2>
+    <div class="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
+        
+        <div id="wallets" class="grid grid-cols-2 md:grid-cols-4 gap-4">
             </div>
-            <div class="bg-white p-4 rounded-lg shadow border-l-4 border-red-500">
-                <p class="text-gray-500 text-sm">Gastos</p>
-                <h2 id="totalGastos" class="text-2xl font-bold text-red-600">$0</h2>
-            </div>
-            <div class="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500">
-                <p class="text-gray-500 text-sm">Balance</p>
-                <h2 id="balance" class="text-2xl font-bold text-blue-600">$0</h2>
-            </div>
-        </div>
 
-        <div class="bg-white p-6 rounded-lg shadow mb-6">
-            <h3 class="font-bold mb-4">Registrar Movimiento</h3>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-                <select id="tipo" class="border p-2 rounded">
-                    <option value="venta">Venta (+)</option>
-                    <option value="gasto">Gasto (-)</option>
-                </select>
-                <input type="text" id="concepto" placeholder="Concepto" class="border p-2 rounded">
-                <input type="number" id="monto" placeholder="Monto" class="border p-2 rounded">
-                <button onclick="agregarMovimiento()" class="bg-blue-600 text-white p-2 rounded hover:bg-blue-700">Guardar</button>
-            </div>
-        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <div class="lg:col-span-4 space-y-6">
+                <div class="bg-white p-5 rounded-xl shadow-sm border">
+                    <h3 class="font-bold mb-3 flex items-center gap-2 text-indigo-700"><i class="fas fa-cog"></i> Configuración</h3>
+                    <div class="space-y-3">
+                        <input id="newCat" type="text" placeholder="Nueva Categoría..." class="w-full text-sm">
+                        <button onclick="addMaster('categories', 'newCat')" class="w-full bg-slate-800 text-white py-2 rounded font-medium active:scale-95 transition">Añadir Categoría</button>
+                        <input id="newWallet" type="text" placeholder="Nuevo Método (MP, Efectivo...)" class="w-full text-sm mt-2">
+                        <button onclick="addMaster('wallets', 'newWallet')" class="w-full bg-slate-800 text-white py-2 rounded font-medium active:scale-95 transition">Añadir Método</button>
+                    </div>
+                </div>
 
-        <div class="bg-white p-6 rounded-lg shadow">
-            <canvas id="graficoVentas"></canvas>
+                <div class="bg-white p-5 rounded-xl shadow-sm border">
+                    <h3 class="font-bold mb-4 text-indigo-700">Registrar Movimiento</h3>
+                    <div class="space-y-4">
+                        <div class="flex gap-2">
+                            <button onclick="setTipo('Venta')" id="btnVenta" class="flex-1 py-2 rounded font-bold border-2 border-green-500 text-green-600 active:scale-95 transition">VENTA</button>
+                            <button onclick="setTipo('Gasto')" id="btnGasto" class="flex-1 py-2 rounded font-bold border-2 border-red-500 text-red-600 active:scale-95 transition">GASTO</button>
+                        </div>
+                        <input id="m_concepto" type="text" placeholder="Concepto / Cliente" class="w-full">
+                        <div class="grid grid-cols-2 gap-2">
+                            <select id="m_cat" class="w-full"></select>
+                            <select id="m_wallet" class="w-full"></select>
+                        </div>
+                        <input id="m_monto" type="number" placeholder="Monto $" class="w-full text-lg font-bold">
+                        <select id="m_estado" class="w-full">
+                            <option value="Pagado">Pagado / Cobrado</option>
+                            <option value="Pendiente">Pendiente</option>
+                        </select>
+                        <button onclick="saveMovimiento()" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold shadow-lg hover:bg-indigo-700 active:active-btn transition">GUARDAR REGISTRO</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-8 space-y-6">
+                <div class="bg-white p-4 rounded-xl shadow-sm border flex flex-wrap gap-4 items-center">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-filter text-slate-400"></i>
+                        <input type="date" id="f_fecha" onchange="actualizarUI()" class="text-sm">
+                    </div>
+                    <select id="f_cat" onchange="actualizarUI()" class="text-sm"><option value="All">Todas las Categorías</option></select>
+                    <input type="text" id="f_search" onkeyup="actualizarUI()" placeholder="Buscar concepto..." class="text-sm flex-1">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border h-64">
+                        <canvas id="chartPie"></canvas>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border h-64">
+                        <canvas id="chartBar"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-100 border-b">
+                            <tr>
+                                <th class="p-3">Fecha</th>
+                                <th class="p-3">Concepto</th>
+                                <th class="p-3">Cat.</th>
+                                <th class="p-3 text-right">Monto</th>
+                                <th class="p-3">Estado</th>
+                                <th class="p-3 text-center">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaBody"></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        let movimientos = JSON.parse(localStorage.getItem('movimientos')) || [];
-        let chart;
+        // --- ESTADO INICIAL ---
+        let db = JSON.parse(localStorage.getItem('biz_db')) || {
+            categories: ['Servicios', 'Retail', 'Gastos Fijos', 'Marketing'],
+            wallets: ['Efectivo', 'Mercado Pago', 'Brubank'],
+            movimientos: []
+        };
+        let currentTipo = 'Venta';
 
-        function agregarMovimiento() {
-            const tipo = document.getElementById('tipo').value;
-            const concepto = document.getElementById('concepto').value;
-            const monto = parseFloat(document.getElementById('monto').value);
+        // --- FUNCIONES CORE ---
+        function setTipo(t) {
+            currentTipo = t;
+            const v = document.getElementById('btnVenta');
+            const g = document.getElementById('btnGasto');
+            if(t === 'Venta') {
+                v.classList.add('bg-green-500', 'text-white');
+                g.classList.remove('bg-red-500', 'text-white');
+            } else {
+                g.classList.add('bg-red-500', 'text-white');
+                v.classList.remove('bg-green-500', 'text-white');
+            }
+        }
 
-            if (!concepto || isNaN(monto)) return alert("Completa los datos");
+        function addMaster(key, inputId) {
+            const val = document.getElementById(inputId).value;
+            if(val) {
+                db[key].push(val);
+                document.getElementById(inputId).value = '';
+                saveAndRefresh();
+            }
+        }
 
-            movimientos.push({ tipo, concepto, monto, fecha: new Date().toLocaleDateString() });
-            localStorage.setItem('movimientos', JSON.stringify(movimientos));
+        function saveMovimiento() {
+            const m = {
+                id: Date.now(),
+                tipo: currentTipo,
+                fecha: new Date().toISOString().split('T')[0],
+                concepto: document.getElementById('m_concepto').value,
+                cat: document.getElementById('m_cat').value,
+                wallet: document.getElementById('m_wallet').value,
+                monto: parseFloat(document.getElementById('m_monto').value),
+                estado: document.getElementById('m_estado').value
+            };
+            if(!m.concepto || isNaN(m.monto)) return alert("Datos incompletos");
+            db.movimientos.unshift(m);
+            saveAndRefresh();
+            // Reset
+            document.getElementById('m_concepto').value = '';
+            document.getElementById('m_monto').value = '';
+        }
+
+        function deleteMov(id) {
+            db.movimientos = db.movimientos.filter(m => m.id !== id);
+            saveAndRefresh();
+        }
+
+        function saveAndRefresh() {
+            localStorage.setItem('biz_db', JSON.stringify(db));
             actualizarUI();
-            
-            document.getElementById('concepto').value = '';
-            document.getElementById('monto').value = '';
         }
 
+        // --- RENDERIZADO ---
+        let pieC, barC;
         function actualizarUI() {
-            const v = movimientos.filter(m => m.tipo === 'venta').reduce((s, m) => s + m.monto, 0);
-            const g = movimientos.filter(m => m.tipo === 'gasto').reduce((s, m) => s + m.monto, 0);
-
-            document.getElementById('totalVentas').innerText = `$${v.toLocaleString()}`;
-            document.getElementById('totalGastos').innerText = `$${g.toLocaleString()}`;
-            document.getElementById('balance').innerText = `$${(v - g).toLocaleString()}`;
+            // Llenar Selects
+            renderSelects();
             
-            renderGrafico(v, g);
+            // Filtros
+            const search = document.getElementById('f_search').value.toLowerCase();
+            const fCat = document.getElementById('f_cat').value;
+            const fDate = document.getElementById('f_fecha').value;
+
+            const filtrados = db.movimientos.filter(m => {
+                return (search === "" || m.concepto.toLowerCase().includes(search)) &&
+                       (fCat === "All" || m.cat === fCat) &&
+                       (fDate === "" || m.fecha === fDate);
+            });
+
+            // Billeteras
+            renderWallets();
+            
+            // Tabla
+            const body = document.getElementById('tablaBody');
+            body.innerHTML = filtrados.map(m => `
+                <tr class="border-b hover:bg-slate-50">
+                    <td class="p-3 text-xs text-slate-500">${m.fecha}</td>
+                    <td class="p-3 font-medium">${m.concepto}</td>
+                    <td class="p-3"><span class="bg-slate-200 px-2 py-0.5 rounded text-[10px]">${m.cat}</span></td>
+                    <td class="p-3 text-right font-bold ${m.tipo === 'Venta' ? 'text-green-600' : 'text-red-600'}">
+                        ${m.tipo === 'Venta' ? '+' : '-'}$${m.monto.toLocaleString()}
+                    </td>
+                    <td class="p-3">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] ${m.estado === 'Pagado' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}">
+                            ${m.estado}
+                        </span>
+                    </td>
+                    <td class="p-3 text-center">
+                        <button onclick="deleteMov(${m.id})" class="text-slate-300 hover:text-red-500"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+
+            updateCharts(filtrados);
         }
 
-        function renderGrafico(v, g) {
-            const ctx = document.getElementById('graficoVentas').getContext('2d');
-            if (chart) chart.destroy();
-            chart = new Chart(ctx, {
-                type: 'bar',
+        function renderSelects() {
+            const cSel = document.getElementById('m_cat');
+            const wSel = document.getElementById('m_wallet');
+            const fCat = document.getElementById('f_cat');
+            
+            const cats = db.categories.map(c => `<option value="${c}">${c}</option>`).join('');
+            const walls = db.wallets.map(w => `<option value="${w}">${w}</option>`).join('');
+            
+            cSel.innerHTML = cats;
+            wSel.innerHTML = walls;
+            if(fCat.options.length <= 1) fCat.innerHTML += cats;
+        }
+
+        function renderWallets() {
+            const container = document.getElementById('wallets');
+            container.innerHTML = db.wallets.map(w => {
+                const saldo = db.movimientos
+                    .filter(m => m.wallet === w && m.estado === 'Pagado')
+                    .reduce((acc, m) => m.tipo === 'Venta' ? acc + m.monto : acc - m.monto, 0);
+                return `
+                    <div class="bg-white p-4 rounded-xl border shadow-sm">
+                        <p class="text-[10px] uppercase font-bold text-slate-400">${w}</p>
+                        <h4 class="text-lg font-bold ${saldo >= 0 ? 'text-indigo-600' : 'text-red-500'}">$${saldo.toLocaleString()}</h4>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateCharts(data) {
+            const v = data.filter(m => m.tipo === 'Venta').reduce((a, b) => a + b.monto, 0);
+            const g = data.filter(m => m.tipo === 'Gasto').reduce((a, b) => a + b.monto, 0);
+
+            if(pieC) pieC.destroy();
+            if(barC) barC.destroy();
+
+            pieC = new Chart(document.getElementById('chartPie'), {
+                type: 'doughnut',
                 data: {
                     labels: ['Ingresos', 'Gastos'],
-                    datasets: [{
-                        label: 'Balance General',
-                        data: [v, g],
-                        backgroundColor: ['#22c55e', '#ef4444']
-                    }]
-                }
+                    datasets: [{ data: [v, g], backgroundColor: ['#22c55e', '#ef4444'] }]
+                },
+                options: { maintainAspectRatio: false, plugins: { title: { display: true, text: 'Balance' } } }
+            });
+
+            barC = new Chart(document.getElementById('chartBar'), {
+                type: 'bar',
+                data: {
+                    labels: ['Efectivo vs Proyección'],
+                    datasets: [
+                        { label: 'Ventas', data: [v], backgroundColor: '#4f46e5' },
+                        { label: 'Gastos', data: [g], backgroundColor: '#94a3b8' }
+                    ]
+                },
+                options: { maintainAspectRatio: false }
             });
         }
+
+        // --- IMPORT/EXPORT ---
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "negocio_backup.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        function importData(e) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                db = JSON.parse(e.target.result);
+                saveAndRefresh();
+            };
+            reader.readAsText(e.target.files[0]);
+        }
+
+        setTipo('Venta');
         actualizarUI();
     </script>
 </body>
