@@ -2,369 +2,335 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Business OS | Premium Manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Business OS Premium</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .btn-active:active { transform: scale(0.95); }
-        .card-shadow { box-shadow: 0 4px 20px -2px rgba(0,0,0,0.05); }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); }
+        .tab-active { color: #4f46e5; border-top: 3px solid #4f46e5; }
+        .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
+        .card-grad { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); }
+        .hide-scroll::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen pb-12">
+<body class="bg-[#f8fafc] text-slate-900">
 
-    <nav class="bg-indigo-900 text-white p-4 sticky top-0 z-50 shadow-xl">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="bg-indigo-500 p-2 rounded-lg"><i class="fas fa-chart-line text-xl"></i></div>
-                <h1 class="font-bold text-xl tracking-tight">BusinessOS <span class="text-indigo-300 font-light text-sm">v2.0</span></h1>
+    <header class="glass sticky top-0 z-50 px-6 py-4 flex justify-between items-center border-b border-slate-200">
+        <div>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Panel de Gestión</p>
+            <h1 class="text-xl font-black text-indigo-900">BusinessOS</h1>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="exportData()" class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 text-slate-600"><i class="fas fa-share-nodes"></i></button>
+            <div class="w-10 h-10 rounded-full bg-indigo-100 border-2 border-white shadow-sm flex items-center justify-center text-indigo-600 font-bold">ME</div>
+        </div>
+    </header>
+
+    <main class="px-4 pt-6 pb-32 max-w-lg mx-auto space-y-8">
+        
+        <section id="view-home" class="view space-y-6">
+            <div class="card-grad p-6 rounded-[2rem] text-white shadow-2xl shadow-indigo-200 relative overflow-hidden">
+                <div class="relative z-10">
+                    <p class="text-indigo-100 text-sm opacity-80">Capital Disponible Total</p>
+                    <h2 id="total-balance" class="text-4xl font-black mt-1">$ 0.00</h2>
+                    <div class="flex gap-4 mt-6">
+                        <div class="bg-white/20 p-3 rounded-2xl flex-1">
+                            <p class="text-[10px] uppercase font-bold opacity-70">Ingresos</p>
+                            <p id="total-ingresos" class="text-lg font-bold">+$0</p>
+                        </div>
+                        <div class="bg-white/20 p-3 rounded-2xl flex-1">
+                            <p class="text-[10px] uppercase font-bold opacity-70">Gastos</p>
+                            <p id="total-gastos" class="text-lg font-bold">-$0</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full"></div>
             </div>
-            <div class="flex gap-3">
-                <button onclick="exportData()" class="p-2 hover:bg-indigo-800 rounded-full transition" title="Exportar Backup"><i class="fas fa-file-export"></i></button>
-                <button onclick="document.getElementById('importFile').click()" class="p-2 hover:bg-indigo-800 rounded-full transition" title="Importar Backup"><i class="fas fa-file-import"></i></button>
+
+            <div>
+                <h3 class="font-bold text-slate-800 mb-3 px-2">Cuentas y Billeteras</h3>
+                <div id="wallet-list" class="flex gap-4 overflow-x-auto pb-2 hide-scroll px-2">
+                    </div>
+            </div>
+
+            <div class="bg-amber-50 border border-amber-100 p-4 rounded-2xl">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-amber-800 font-bold text-sm uppercase tracking-tight">Pendientes de Cobro/Pago</h3>
+                    <span id="pending-count" class="bg-amber-200 text-amber-800 text-[10px] px-2 py-0.5 rounded-full font-black">0</span>
+                </div>
+                <div id="pending-list" class="space-y-2">
+                    </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                <canvas id="mainChart" height="250"></canvas>
+            </div>
+        </section>
+
+        <section id="view-add" class="view hidden space-y-6">
+            <div class="bg-white p-6 rounded-[2rem] border shadow-sm">
+                <h2 class="text-xl font-black mb-6">Nuevo Movimiento</h2>
+                <div class="space-y-4">
+                    <div class="flex p-1 bg-slate-100 rounded-2xl">
+                        <button onclick="setMode('Venta')" id="mode-venta" class="flex-1 py-3 rounded-xl font-bold transition">VENTA</button>
+                        <button onclick="setMode('Gasto')" id="mode-gasto" class="flex-1 py-3 rounded-xl font-bold transition text-slate-400">GASTO</button>
+                    </div>
+                    <input id="in-concepto" type="text" placeholder="¿Qué compraste o vendiste?" class="w-full p-4 rounded-2xl bg-slate-50 border-none focus:ring-2 focus:ring-indigo-500 outline-none font-medium">
+                    <div class="grid grid-cols-2 gap-3">
+                        <select id="in-cat" class="bg-slate-50 p-4 rounded-2xl border-none text-sm font-bold"></select>
+                        <select id="in-wallet" class="bg-slate-50 p-4 rounded-2xl border-none text-sm font-bold"></select>
+                    </div>
+                    <div class="relative">
+                        <span class="absolute left-4 top-4 font-bold text-slate-400">$</span>
+                        <input id="in-monto" type="number" placeholder="0.00" class="w-full p-4 pl-8 rounded-2xl bg-slate-50 border-none text-2xl font-black text-indigo-600 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <select id="in-estado" class="w-full p-4 rounded-2xl bg-slate-50 border-none font-bold text-sm">
+                        <option value="Pagado">Ya pagado/cobrado</option>
+                        <option value="Pendiente">Pendiente (A pagar/cobrar)</option>
+                    </select>
+                    <button onclick="saveData()" class="w-full bg-indigo-600 text-white py-5 rounded-[2rem] font-black shadow-xl shadow-indigo-100 active:scale-95 transition">GUARDAR REGISTRO</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-list" class="view hidden space-y-4">
+            <div class="flex gap-2">
+                <input type="text" id="search-bar" onkeyup="renderHistory()" placeholder="Buscar..." class="flex-1 p-3 rounded-xl bg-white border border-slate-200 outline-none">
+                <button onclick="document.getElementById('importFile').click()" class="bg-white p-3 rounded-xl border border-slate-200 text-slate-400"><i class="fas fa-file-import"></i></button>
                 <input type="file" id="importFile" class="hidden" onchange="importData(event)">
             </div>
-        </div>
-    </nav>
-
-    <main class="max-w-7xl mx-auto p-4 md:p-6 space-y-8">
-        
-        <section>
-            <h2 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Disponibilidad en Billeteras</h2>
-            <div id="walletsContainer" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div id="history-container" class="space-y-3">
                 </div>
         </section>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            
-            <aside class="lg:col-span-4 space-y-6">
+        <section id="view-settings" class="view hidden space-y-6">
+            <div class="bg-white p-6 rounded-[2rem] border">
+                <h3 class="font-bold mb-4">Añadir Maestros</h3>
+                <input id="master-cat" type="text" placeholder="Nueva Categoría..." class="w-full p-3 rounded-xl bg-slate-50 mb-2 border-none">
+                <button onclick="addMaster('categories', 'master-cat')" class="w-full bg-slate-800 text-white py-3 rounded-xl font-bold mb-6">Añadir Categoría</button>
                 
-                <div class="bg-white p-6 rounded-2xl border card-shadow">
-                    <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fas fa-folder-plus text-indigo-500"></i> Maestros</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-400 uppercase">Categoría / Subcategoría</label>
-                            <div class="flex gap-2 mt-1">
-                                <input id="newCat" type="text" placeholder="Ej: Ventas > Local" class="w-full text-sm border-slate-200 rounded-lg p-2 bg-slate-50 focus:ring-2 focus:ring-indigo-500 outline-none">
-                                <button onclick="addMaster('categories', 'newCat')" class="bg-indigo-600 text-white px-3 rounded-lg btn-active hover:bg-indigo-700 transition">+</button>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-400 uppercase">Método de Pago</label>
-                            <div class="flex gap-2 mt-1">
-                                <input id="newWallet" type="text" placeholder="Ej: Mercado Pago" class="w-full text-sm border-slate-200 rounded-lg p-2 bg-slate-50 focus:ring-2 focus:ring-indigo-500 outline-none">
-                                <button onclick="addMaster('wallets', 'newWallet')" class="bg-indigo-600 text-white px-3 rounded-lg btn-active hover:bg-indigo-700 transition">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-2xl border card-shadow border-t-4 border-t-indigo-500">
-                    <h3 class="font-bold text-slate-800 mb-6 flex items-center gap-2"><i class="fas fa-plus-circle text-indigo-500"></i> Nuevo Registro</h3>
-                    <div class="space-y-4">
-                        <div class="flex p-1 bg-slate-100 rounded-xl">
-                            <button onclick="setTipo('Venta')" id="btnVenta" class="flex-1 py-2 rounded-lg font-bold transition text-sm">VENTA</button>
-                            <button onclick="setTipo('Gasto')" id="btnGasto" class="flex-1 py-2 rounded-lg font-bold transition text-sm">GASTO</button>
-                        </div>
-                        
-                        <div class="space-y-1">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase">Concepto / Detalle</label>
-                            <input id="m_concepto" type="text" placeholder="Ej: Venta Juan Pérez" class="w-full border-slate-200 rounded-lg p-2 outline-none focus:border-indigo-500">
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="space-y-1">
-                                <label class="text-[10px] font-bold text-slate-400 uppercase">Categoría</label>
-                                <select id="m_cat" class="w-full border-slate-200 rounded-lg p-2 outline-none text-sm"></select>
-                            </div>
-                            <div class="space-y-1">
-                                <label class="text-[10px] font-bold text-slate-400 uppercase">Método</label>
-                                <select id="m_wallet" class="w-full border-slate-200 rounded-lg p-2 outline-none text-sm"></select>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="space-y-1">
-                                <label class="text-[10px] font-bold text-slate-400 uppercase">Monto ($)</label>
-                                <input id="m_monto" type="number" placeholder="0.00" class="w-full border-slate-200 rounded-lg p-2 font-bold text-lg outline-none text-indigo-700">
-                            </div>
-                            <div class="space-y-1">
-                                <label class="text-[10px] font-bold text-slate-400 uppercase">Estado</label>
-                                <select id="m_estado" class="w-full border-slate-200 rounded-lg p-2 outline-none text-sm">
-                                    <option value="Pagado">Pagado</option>
-                                    <option value="Pendiente">Pendiente</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <button onclick="saveMovimiento()" class="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 btn-active transition mt-2">
-                            GUARDAR MOVIMIENTO
-                        </button>
-                    </div>
-                </div>
-            </aside>
-
-            <div class="lg:col-span-8 space-y-6">
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-2xl border card-shadow">
-                        <canvas id="chartPie" style="max-height: 200px;"></canvas>
-                    </div>
-                    <div class="bg-white p-6 rounded-2xl border card-shadow flex flex-col justify-center text-center">
-                        <p class="text-slate-400 text-sm font-medium">Utilidad Neta del Período</p>
-                        <h2 id="utilidadNeta" class="text-4xl font-black text-slate-800 mt-2">$0</h2>
-                        <div id="utilidadBadge" class="mt-2 inline-block px-3 py-1 rounded-full text-xs font-bold mx-auto"></div>
-                    </div>
-                </div>
-
-                <div class="bg-white p-4 rounded-2xl border card-shadow flex flex-wrap gap-4 items-center">
-                    <div class="relative flex-1 min-w-[200px]">
-                        <i class="fas fa-search absolute left-3 top-3 text-slate-400"></i>
-                        <input type="text" id="f_search" onkeyup="actualizarUI()" placeholder="Buscar por concepto o categoría..." class="w-full pl-10 pr-4 py-2 border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50">
-                    </div>
-                    <select id="f_mes" onchange="actualizarUI()" class="border-slate-200 rounded-xl p-2 text-sm bg-white outline-none">
-                        <option value="All">Todos los meses</option>
-                        <option value="0">Enero</option><option value="1">Febrero</option><option value="2">Marzo</option>
-                        <option value="3">Abril</option><option value="4">Mayo</option><option value="5">Junio</option>
-                        <option value="6">Julio</option><option value="7">Agosto</option><option value="8">Septiembre</option>
-                        <option value="9">Octubre</option><option value="10">Noviembre</option><option value="11">Diciembre</option>
-                    </select>
-                </div>
-
-                <div class="bg-white rounded-2xl border card-shadow overflow-hidden">
-                    <div class="p-4 border-b bg-slate-50 flex justify-between items-center">
-                        <h3 class="font-bold text-slate-700">Historial de Movimientos</h3>
-                        <span id="contadorReg" class="text-xs font-bold text-slate-400 bg-white px-2 py-1 rounded border">0 Registros</span>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm">
-                            <thead>
-                                <tr class="text-slate-400 font-bold border-b text-[10px] uppercase">
-                                    <th class="p-4">Fecha</th>
-                                    <th class="p-4">Concepto</th>
-                                    <th class="p-4 text-right">Monto</th>
-                                    <th class="p-4">Estado</th>
-                                    <th class="p-4 text-center">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tablaBody"></tbody>
-                        </table>
-                    </div>
-                </div>
+                <input id="master-wall" type="text" placeholder="Nueva Billetera..." class="w-full p-3 rounded-xl bg-slate-50 mb-2 border-none">
+                <button onclick="addMaster('wallets', 'master-wall')" class="w-full bg-slate-800 text-white py-3 rounded-xl font-bold">Añadir Billetera</button>
             </div>
-        </div>
+            <button onclick="localStorage.clear(); location.reload();" class="w-full py-4 text-red-500 font-bold border-2 border-red-100 rounded-2xl mt-10">BORRAR TODOS LOS DATOS</button>
+        </section>
+
     </main>
 
+    <nav class="fixed bottom-0 left-0 right-0 glass border-t border-slate-200 px-6 py-3 flex justify-between items-center safe-area-bottom shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+        <button onclick="switchTab('home')" id="tab-home" class="flex flex-col items-center gap-1 text-slate-400 tab-active">
+            <i class="fas fa-house-chimney text-lg"></i>
+            <span class="text-[10px] font-bold">Inicio</span>
+        </button>
+        <button onclick="switchTab('list')" id="tab-list" class="flex flex-col items-center gap-1 text-slate-400">
+            <i class="fas fa-receipt text-lg"></i>
+            <span class="text-[10px] font-bold">Hitos</span>
+        </button>
+        <button onclick="switchTab('add')" id="tab-add" class="flex flex-col items-center justify-center -mt-12 bg-indigo-600 w-14 h-14 rounded-full text-white shadow-xl shadow-indigo-200 border-4 border-white">
+            <i class="fas fa-plus text-xl"></i>
+        </button>
+        <button onclick="switchTab('settings')" id="tab-settings" class="flex flex-col items-center gap-1 text-slate-400">
+            <i class="fas fa-sliders text-lg"></i>
+            <span class="text-[10px] font-bold">Config</span>
+        </button>
+        <button onclick="exportData()" class="flex flex-col items-center gap-1 text-slate-400">
+            <i class="fas fa-cloud-arrow-down text-lg"></i>
+            <span class="text-[10px] font-bold">Backup</span>
+        </button>
+    </nav>
+
     <script>
-        // --- BASE DE DATOS ---
-        let db = JSON.parse(localStorage.getItem('biz_db_v2')) || {
-            categories: ['Ventas > Producto', 'Ventas > Servicios', 'Gastos > Fijo', 'Gastos > Variable', 'Inversión'],
-            wallets: ['Efectivo', 'Mercado Pago', 'Brubank', 'Banco Santander'],
-            movimientos: []
+        // DB INICIAL
+        let db = JSON.parse(localStorage.getItem('biz_v3')) || {
+            categories: ['Servicios', 'Venta Local', 'Marketing', 'Alquiler', 'Sueldos'],
+            wallets: ['Mercado Pago', 'Brubank', 'Efectivo', 'Galicia'],
+            movs: []
         };
-        
-        let currentTipo = 'Venta';
-        let pieC;
+        let currentMode = 'Venta';
+        let mainChart;
 
-        // --- INICIALIZACIÓN ---
-        function init() {
-            setTipo('Venta');
-            renderSelects();
-            actualizarUI();
-        }
-
-        function setTipo(t) {
-            currentTipo = t;
-            const v = document.getElementById('btnVenta');
-            const g = document.getElementById('btnGasto');
-            if(t === 'Venta') {
-                v.className = "flex-1 py-2 rounded-lg font-bold transition text-sm bg-green-500 text-white shadow-md shadow-green-200";
-                g.className = "flex-1 py-2 rounded-lg font-bold transition text-sm text-slate-400 hover:text-slate-600";
-            } else {
-                g.className = "flex-1 py-2 rounded-lg font-bold transition text-sm bg-red-500 text-white shadow-md shadow-red-200";
-                v.className = "flex-1 py-2 rounded-lg font-bold transition text-sm text-slate-400 hover:text-slate-600";
-            }
-        }
-
-        function addMaster(key, inputId) {
-            const val = document.getElementById(inputId).value.trim();
-            if(val) {
-                db[key].push(val);
-                document.getElementById(inputId).value = '';
-                renderSelects();
-                save();
-            }
-        }
-
-        function saveMovimiento() {
-            const concepto = document.getElementById('m_concepto').value;
-            const monto = parseFloat(document.getElementById('m_monto').value);
+        // SWITCH DE VISTAS
+        function switchTab(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+            document.getElementById('view-' + viewId).classList.remove('hidden');
             
-            if(!concepto || isNaN(monto)) {
-                alert("Por favor completa concepto y monto.");
-                return;
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('tab-active'));
+            document.getElementById('tab-' + viewId).classList.add('tab-active');
+            
+            if(viewId === 'home') renderDashboard();
+            if(viewId === 'list') renderHistory();
+            if(viewId === 'add') renderSelects();
+        }
+
+        function setMode(m) {
+            currentMode = m;
+            const v = document.getElementById('mode-venta');
+            const g = document.getElementById('mode-gasto');
+            if(m === 'Venta') {
+                v.className = "flex-1 py-3 rounded-xl font-bold bg-white shadow-sm text-indigo-600";
+                g.className = "flex-1 py-3 rounded-xl font-bold text-slate-400";
+            } else {
+                g.className = "flex-1 py-3 rounded-xl font-bold bg-white shadow-sm text-red-600";
+                v.className = "flex-1 py-3 rounded-xl font-bold text-slate-400";
             }
+        }
+
+        function renderSelects() {
+            document.getElementById('in-cat').innerHTML = db.categories.map(c => `<option value="${c}">${c}</option>`).join('');
+            document.getElementById('in-wallet').innerHTML = db.wallets.map(w => `<option value="${w}">${w}</option>`).join('');
+        }
+
+        function saveData() {
+            const concepto = document.getElementById('in-concepto').value;
+            const monto = parseFloat(document.getElementById('in-monto').value);
+            if(!concepto || isNaN(monto)) return alert("Completa los datos");
 
             const mov = {
                 id: Date.now(),
-                tipo: currentTipo,
-                fecha: new Date().toISOString(),
-                concepto: concepto,
-                cat: document.getElementById('m_cat').value,
-                wallet: document.getElementById('m_wallet').value,
-                monto: monto,
-                estado: document.getElementById('m_estado').value
+                tipo: currentMode,
+                concepto,
+                cat: document.getElementById('in-cat').value,
+                wallet: document.getElementById('in-wallet').value,
+                monto,
+                estado: document.getElementById('in-estado').value,
+                fecha: new Date().toISOString()
             };
 
-            db.movimientos.unshift(mov);
-            save();
-            document.getElementById('m_concepto').value = '';
-            document.getElementById('m_monto').value = '';
-            actualizarUI();
+            db.movs.unshift(mov);
+            saveToLocal();
+            document.getElementById('in-concepto').value = '';
+            document.getElementById('in-monto').value = '';
+            switchTab('home');
         }
 
-        function deleteMov(id) {
-            if(confirm("¿Eliminar este registro?")) {
-                db.movimientos = db.movimientos.filter(m => m.id !== id);
-                save();
-                actualizarUI();
-            }
+        function saveToLocal() {
+            localStorage.setItem('biz_v3', JSON.stringify(db));
         }
 
-        function toggleEstado(id) {
-            const mov = db.movimientos.find(m => m.id === id);
-            mov.estado = mov.estado === 'Pagado' ? 'Pendiente' : 'Pagado';
-            save();
-            actualizarUI();
-        }
+        function renderDashboard() {
+            // Totales
+            const totalIng = db.movs.filter(m => m.tipo === 'Venta' && m.estado === 'Pagado').reduce((a, b) => a + b.monto, 0);
+            const totalGas = db.movs.filter(m => m.tipo === 'Gasto' && m.estado === 'Pagado').reduce((a, b) => a + b.monto, 0);
+            
+            document.getElementById('total-balance').innerText = `$ ${(totalIng - totalGas).toLocaleString()}`;
+            document.getElementById('total-ingresos').innerText = `+$${totalIng.toLocaleString()}`;
+            document.getElementById('total-gastos').innerText = `-$${totalGas.toLocaleString()}`;
 
-        function save() {
-            localStorage.setItem('biz_db_v2', JSON.stringify(db));
-        }
-
-        // --- RENDERIZADO ---
-        function renderSelects() {
-            const cSel = document.getElementById('m_cat');
-            const wSel = document.getElementById('m_wallet');
-            cSel.innerHTML = db.categories.map(c => `<option value="${c}">${c}</option>`).join('');
-            wSel.innerHTML = db.wallets.map(w => `<option value="${w}">${w}</option>`).join('');
-        }
-
-        function actualizarUI() {
-            const search = document.getElementById('f_search').value.toLowerCase();
-            const mesSel = document.getElementById('f_mes').value;
-
-            const filtrados = db.movimientos.filter(m => {
-                const date = new Date(m.fecha);
-                const matchesSearch = m.concepto.toLowerCase().includes(search) || m.cat.toLowerCase().includes(search);
-                const matchesMes = mesSel === "All" || date.getMonth().toString() === mesSel;
-                return matchesSearch && matchesMes;
-            });
-
-            // Totales por Billetera
-            const wCont = document.getElementById('walletsContainer');
-            wCont.innerHTML = db.wallets.map(w => {
-                const total = db.movimientos
+            // Listado de billeteras
+            const wList = document.getElementById('wallet-list');
+            wList.innerHTML = db.wallets.map(w => {
+                const saldo = db.movs
                     .filter(m => m.wallet === w && m.estado === 'Pagado')
                     .reduce((acc, m) => m.tipo === 'Venta' ? acc + m.monto : acc - m.monto, 0);
                 return `
-                    <div class="bg-white p-4 rounded-2xl border card-shadow">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tight">${w}</p>
-                        <h4 class="text-xl font-black ${total >= 0 ? 'text-indigo-600' : 'text-red-500'} mt-1">$${total.toLocaleString()}</h4>
+                    <div class="min-w-[140px] bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">${w}</p>
+                        <p class="text-sm font-bold mt-1 ${saldo >= 0 ? 'text-indigo-600' : 'text-red-500'}">$${saldo.toLocaleString()}</p>
                     </div>
                 `;
             }).join('');
 
-            // Totales KPI
-            const ingresos = filtrados.filter(m => m.tipo === 'Venta').reduce((a, b) => a + b.monto, 0);
-            const gastos = filtrados.filter(m => m.tipo === 'Gasto').reduce((a, b) => a + b.monto, 0);
-            const utilidad = ingresos - gastos;
+            // Pendientes
+            const pends = db.movs.filter(m => m.estado === 'Pendiente');
+            document.getElementById('pending-count').innerText = pends.length;
+            document.getElementById('pending-list').innerHTML = pends.slice(0,3).map(m => `
+                <div class="flex justify-between items-center bg-white/50 p-2 rounded-xl text-xs">
+                    <span class="font-bold text-slate-700">${m.concepto}</span>
+                    <span class="${m.tipo === 'Venta' ? 'text-green-600' : 'text-red-600'} font-black">$${m.monto.toLocaleString()}</span>
+                </div>
+            `).join('');
 
-            document.getElementById('utilidadNeta').innerText = `$${utilidad.toLocaleString()}`;
-            const badge = document.getElementById('utilidadBadge');
-            badge.innerText = utilidad >= 0 ? 'RENDIMIENTO POSITIVO' : 'DÉFICIT EN PERÍODO';
-            badge.className = `mt-2 inline-block px-3 py-1 rounded-full text-[9px] font-black mx-auto ${utilidad >= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`;
-
-            // Tabla
-            document.getElementById('contadorReg').innerText = `${filtrados.length} Registros`;
-            const body = document.getElementById('tablaBody');
-            body.innerHTML = filtrados.map(m => {
-                const d = new Date(m.fecha);
-                return `
-                <tr class="border-b hover:bg-slate-50 transition">
-                    <td class="p-4">
-                        <p class="font-bold text-slate-700">${d.getDate()}/${d.getMonth()+1}</p>
-                        <p class="text-[10px] text-slate-400">${d.getFullYear()}</p>
-                    </td>
-                    <td class="p-4">
-                        <p class="font-semibold text-slate-800">${m.concepto}</p>
-                        <p class="text-[10px] bg-slate-100 text-slate-500 inline-block px-2 rounded-full mt-1">${m.cat} • ${m.wallet}</p>
-                    </td>
-                    <td class="p-4 text-right">
-                        <p class="font-black ${m.tipo === 'Venta' ? 'text-green-600' : 'text-red-600'} text-base">
-                            ${m.tipo === 'Venta' ? '+' : '-'}$${m.monto.toLocaleString()}
-                        </p>
-                    </td>
-                    <td class="p-4">
-                        <button onclick="toggleEstado(${m.id})" class="px-3 py-1 rounded-full text-[10px] font-black transition ${m.estado === 'Pagado' ? 'bg-green-500 text-white shadow-lg shadow-green-100' : 'bg-orange-400 text-white shadow-lg shadow-orange-100'}">
-                            ${m.estado.toUpperCase()}
-                        </button>
-                    </td>
-                    <td class="p-4 text-center">
-                        <button onclick="deleteMov(${m.id})" class="text-slate-300 hover:text-red-500 p-2 transition"><i class="fas fa-trash-alt"></i></button>
-                    </td>
-                </tr>`;
-            }).join('');
-
-            updateChart(ingresos, gastos);
+            updateChart(totalIng, totalGas);
         }
 
-        function updateChart(i, g) {
-            const ctx = document.getElementById('chartPie').getContext('2d');
-            if(pieC) pieC.destroy();
-            pieC = new Chart(ctx, {
+        function renderHistory() {
+            const query = document.getElementById('search-bar').value.toLowerCase();
+            const filtered = db.movs.filter(m => m.concepto.toLowerCase().includes(query) || m.cat.toLowerCase().includes(query));
+            
+            document.getElementById('history-container').innerHTML = filtered.map(m => `
+                <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border border-slate-50">
+                    <div class="flex gap-4 items-center">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center ${m.tipo === 'Venta' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}">
+                            <i class="fas ${m.tipo === 'Venta' ? 'fa-arrow-up' : 'fa-arrow-down'} text-xs"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sm text-slate-800">${m.concepto}</h4>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase">${m.cat} • ${m.estado}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-black ${m.tipo === 'Venta' ? 'text-green-600' : 'text-red-600'} text-sm">
+                            ${m.tipo === 'Venta' ? '+' : '-'}$${m.monto.toLocaleString()}
+                        </p>
+                        <button onclick="deleteMov(${m.id})" class="text-[10px] text-slate-300 font-bold">ELIMINAR</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function deleteMov(id) {
+            db.movs = db.movs.filter(m => m.id !== id);
+            saveToLocal();
+            renderHistory();
+        }
+
+        function addMaster(key, inputId) {
+            const val = document.getElementById(inputId).value;
+            if(val) {
+                db[key].push(val);
+                document.getElementById(inputId).value = '';
+                saveToLocal();
+                alert("Guardado!");
+            }
+        }
+
+        function updateChart(ing, gas) {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            if(mainChart) mainChart.destroy();
+            mainChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Ingresos', 'Gastos'],
                     datasets: [{
-                        data: [i, g],
-                        backgroundColor: ['#4ade80', '#f87171'],
+                        data: [ing, gas],
+                        backgroundColor: ['#4f46e5', '#f1f5f9'],
                         borderWidth: 0,
-                        hoverOffset: 10
+                        cutout: '80%'
                     }]
                 },
                 options: {
                     maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10, weight: 'bold' } } } }
+                    plugins: { legend: { display: false } }
                 }
             });
         }
 
-        // --- BACKUP ---
         function exportData() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
-            const dl = document.createElement('a');
-            dl.setAttribute("href", dataStr);
-            dl.setAttribute("download", `Backup_BusinessOS_${new Date().toLocaleDateString()}.json`);
-            dl.click();
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", "backup_business.json");
+            dlAnchor.click();
         }
 
         function importData(e) {
             const reader = new FileReader();
             reader.onload = (ev) => {
                 db = JSON.parse(ev.target.result);
-                save();
-                init();
+                saveToLocal();
+                location.reload();
             };
             reader.readAsText(e.target.files[0]);
         }
 
-        window.onload = init;
+        window.onload = () => {
+            setMode('Venta');
+            renderDashboard();
+        };
     </script>
 </body>
 </html>
