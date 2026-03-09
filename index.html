@@ -1,421 +1,97 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Stella Maris · Gestión</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body { font-family: 'Segoe UI', sans-serif; }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business App Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gray-100 font-sans">
+    <nav class="bg-blue-600 p-4 text-white shadow-lg">
+        <h1 class="text-xl font-bold">🚀 Mi Negocio App</h1>
+    </nav>
 
-  <!-- Navbar -->
-  <header class="bg-blue-800 text-white p-4 shadow">
-    <div class="max-w-6xl mx-auto flex justify-between items-center">
-      <h1 class="text-2xl font-bold">Stella Maris · Gestión</h1>
-      <div class="space-x-4">
-        <button onclick="exportData()" class="bg-green-600 px-3 py-1 rounded hover:bg-green-700">Exportar</button>
-        <button onclick="importData()" class="bg-yellow-600 px-3 py-1 rounded hover:bg-yellow-700">Importar</button>
-      </div>
+    <div class="p-4 max-w-4xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-white p-4 rounded-lg shadow border-l-4 border-green-500">
+                <p class="text-gray-500 text-sm">Ingresos</p>
+                <h2 id="totalVentas" class="text-2xl font-bold text-green-600">$0</h2>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow border-l-4 border-red-500">
+                <p class="text-gray-500 text-sm">Gastos</p>
+                <h2 id="totalGastos" class="text-2xl font-bold text-red-600">$0</h2>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow border-l-4 border-blue-500">
+                <p class="text-gray-500 text-sm">Balance</p>
+                <h2 id="balance" class="text-2xl font-bold text-blue-600">$0</h2>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h3 class="font-bold mb-4">Registrar Movimiento</h3>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <select id="tipo" class="border p-2 rounded">
+                    <option value="venta">Venta (+)</option>
+                    <option value="gasto">Gasto (-)</option>
+                </select>
+                <input type="text" id="concepto" placeholder="Concepto" class="border p-2 rounded">
+                <input type="number" id="monto" placeholder="Monto" class="border p-2 rounded">
+                <button onclick="agregarMovimiento()" class="bg-blue-600 text-white p-2 rounded hover:bg-blue-700">Guardar</button>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow">
+            <canvas id="graficoVentas"></canvas>
+        </div>
     </div>
-  </header>
 
-  <!-- Navegación principal -->
-  <nav class="bg-white shadow p-4">
-    <div class="max-w-6xl mx-auto flex flex-wrap gap-3">
-      <button onclick="showTab('dashboard')" class="tab-btn bg-blue-600 text-white px-4 py-2 rounded">Dashboard</button>
-      <button onclick="showTab('ventas')" class="tab-btn bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">Cargar Venta</button>
-      <button onclick="showTab('gastos')" class="tab-btn bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">Cargar Gasto</button>
-      <button onclick="showTab('traspaso')" class="tab-btn bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">Traspaso</button>
-      <button onclick="showTab('historial')" class="tab-btn bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">Historial Movimientos</button>
-      <button onclick="showTab('maestros')" class="tab-btn bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">Maestros</button>
-      <button onclick="showTab('pendientes')" class="tab-btn bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">Pendientes</button>
-    </div>
-  </nav>
+    <script>
+        let movimientos = JSON.parse(localStorage.getItem('movimientos')) || [];
+        let chart;
 
-  <!-- Contenido -->
-  <main class="max-w-6xl mx-auto p-6">
+        function agregarMovimiento() {
+            const tipo = document.getElementById('tipo').value;
+            const concepto = document.getElementById('concepto').value;
+            const monto = parseFloat(document.getElementById('monto').value);
 
-    <!-- Dashboard -->
-    <section id="dashboard" class="tab-content active">
-      <h2 class="text-2xl font-bold mb-6">Dashboard - Mes Actual</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="bg-white p-6 rounded shadow">
-          <h3 class="text-lg font-semibold">Ventas Mes</h3>
-          <p id="ventas-mes" class="text-3xl font-bold text-green-600">$0</p>
-        </div>
-        <div class="bg-white p-6 rounded shadow">
-          <h3 class="text-lg font-semibold">Gastos Pagados Mes</h3>
-          <p id="gastos-mes" class="text-3xl font-bold text-red-600">$0</p>
-        </div>
-        <div class="bg-white p-6 rounded shadow">
-          <h3 class="text-lg font-semibold">Resultado Mes</h3>
-          <p id="resultado-mes" class="text-3xl font-bold">$0</p>
-        </div>
-      </div>
+            if (!concepto || isNaN(monto)) return alert("Completa los datos");
 
-      <h3 class="text-xl font-bold mb-4">Saldos por Método</h3>
-      <table class="w-full bg-white rounded shadow">
-        <thead class="bg-gray-200">
-          <tr><th class="p-3 text-left">Método</th><th class="p-3">Calculado</th><th class="p-3">Real (editable)</th><th class="p-3">Diferencia</th></tr>
-        </thead>
-        <tbody id="saldos-tbody"></tbody>
-      </table>
-    </section>
-
-    <!-- Cargar Venta -->
-    <section id="ventas" class="tab-content">
-      <h2 class="text-2xl font-bold mb-6">Cargar Venta</h2>
-      <form id="form-venta" class="bg-white p-6 rounded shadow max-w-lg">
-        <div class="mb-4">
-          <label class="block mb-1">Monto</label>
-          <input type="number" id="venta-monto" class="w-full p-2 border rounded" required min="0" step="0.01"/>
-        </div>
-        <div class="mb-4">
-          <label class="block mb-1">Método</label>
-          <select id="venta-metodo" class="w-full p-2 border rounded"></select>
-        </div>
-        <div class="mb-4">
-          <label class="block mb-1">Notas</label>
-          <input type="text" id="venta-notas" class="w-full p-2 border rounded"/>
-        </div>
-        <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">Guardar Venta</button>
-      </form>
-    </section>
-
-    <!-- Cargar Gasto (similar, pero agrego categoría) -->
-    <section id="gastos" class="tab-content">
-      <h2 class="text-2xl font-bold mb-6">Cargar Gasto</h2>
-      <form id="form-gasto" class="bg-white p-6 rounded shadow max-w-lg">
-        <div class="mb-4">
-          <label class="block mb-1">Monto</label>
-          <input type="number" id="gasto-monto" required min="0" step="0.01" class="w-full p-2 border rounded"/>
-        </div>
-        <div class="mb-4">
-          <label class="block mb-1">Categoría</label>
-          <select id="gasto-categoria" class="w-full p-2 border rounded"></select>
-        </div>
-        <div class="mb-4">
-          <label class="block mb-1">Método de pago</label>
-          <select id="gasto-metodo" class="w-full p-2 border rounded"></select>
-        </div>
-        <div class="mb-4">
-          <label class="block mb-1">Notas</label>
-          <input type="text" id="gasto-notas" class="w-full p-2 border rounded"/>
-        </div>
-        <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700">Guardar Gasto</button>
-      </form>
-    </section>
-
-    <!-- Traspaso -->
-    <section id="traspaso" class="tab-content">
-      <h2 class="text-2xl font-bold mb-6">Traspaso entre cuentas</h2>
-      <form id="form-traspaso" class="bg-white p-6 rounded shadow max-w-lg">
-        <div class="mb-4">
-          <label class="block mb-1">Monto</label>
-          <input type="number" id="traspaso-monto" required min="0" step="0.01" class="w-full p-2 border rounded"/>
-        </div>
-        <div class="mb-4">
-          <label class="block mb-1">Origen</label>
-          <select id="traspaso-origen" class="w-full p-2 border rounded"></select>
-        </div>
-        <div class="mb-4">
-          <label class="block mb-1">Destino</label>
-          <select id="traspaso-destino" class="w-full p-2 border rounded"></select>
-        </div>
-        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">Guardar Traspaso</button>
-      </form>
-    </section>
-
-    <!-- Historial Movimientos -->
-    <section id="historial" class="tab-content">
-      <h2 class="text-2xl font-bold mb-6">Historial de Movimientos</h2>
-      <input type="month" id="filtro-mes" class="p-2 border rounded mb-4"/>
-      <table class="w-full bg-white rounded shadow">
-        <thead class="bg-gray-200">
-          <tr><th class="p-3 text-left">Fecha</th><th>Tipo</th><th>Monto</th><th>Método/Origen</th><th>Destino/Cat</th><th>Notas</th></tr>
-        </thead>
-        <tbody id="historial-tbody"></tbody>
-      </table>
-    </section>
-
-    <!-- Maestros -->
-    <section id="maestros" class="tab-content">
-      <h2 class="text-2xl font-bold mb-6">Maestros</h2>
-      
-      <div class="mb-8">
-        <h3 class="text-xl font-bold mb-3">Métodos de Pago</h3>
-        <input type="text" id="nuevo-metodo" placeholder="Ej: Mercado Pago" class="p-2 border rounded mr-2"/>
-        <button onclick="agregarMetodo()" class="bg-green-600 text-white px-4 py-2 rounded">Agregar</button>
-        <ul id="lista-metodos" class="mt-4 list-disc pl-6"></ul>
-      </div>
-
-      <div>
-        <h3 class="text-xl font-bold mb-3">Categorías y Subcategorías</h3>
-        <input type="text" id="nueva-categoria" placeholder="Ej: Proveedores" class="p-2 border rounded mr-2"/>
-        <button onclick="agregarCategoria()" class="bg-green-600 text-white px-4 py-2 rounded">Agregar Categoría</button>
-        <ul id="lista-categorias" class="mt-4 list-disc pl-6"></ul>
-      </div>
-    </section>
-
-    <!-- Pendientes (simple lista por ahora) -->
-    <section id="pendientes" class="tab-content">
-      <h2 class="text-2xl font-bold mb-6">Pendientes por Categoría</h2>
-      <p class="text-gray-600 mb-4">Aquí irían saldos pendientes (por ej. deudas o por cobrar). Por ahora es placeholder.</p>
-      <ul id="lista-pendientes" class="list-disc pl-6"></ul>
-    </section>
-
-  </main>
-
-  <script>
-    // Datos en memoria
-    let data = {
-      metodos: JSON.parse(localStorage.getItem('metodos')) || ['Efectivo', 'Mercado Pago'],
-      categorias: JSON.parse(localStorage.getItem('categorias')) || ['Proveedores', 'Alquiler'],
-      movimientos: JSON.parse(localStorage.getItem('movimientos')) || [] // {fecha, tipo, monto, metodo, destinoCat, notas}
-    };
-
-    function saveData() {
-      localStorage.setItem('metodos', JSON.stringify(data.metodos));
-      localStorage.setItem('categorias', JSON.stringify(data.categorias));
-      localStorage.setItem('movimientos', JSON.stringify(data.movimientos));
-      actualizarDashboard();
-      actualizarHistorial();
-    }
-
-    function showTab(tabId) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-      if (tabId === 'dashboard') actualizarDashboard();
-      if (tabId === 'historial') actualizarHistorial();
-      if (tabId === 'maestros') actualizarMaestros();
-    }
-
-    function actualizarDashboard() {
-      const hoy = new Date();
-      const mesActual = hoy.getFullYear() + '-' + String(hoy.getMonth()+1).padStart(2,'0');
-
-      let ventasMes = 0, gastosMes = 0;
-      const saldosCalc = {};
-      data.metodos.forEach(m => saldosCalc[m] = 0);
-
-      data.movimientos.forEach(mov => {
-        if (mov.fecha.startsWith(mesActual)) {
-          if (mov.tipo === 'venta') ventasMes += mov.monto;
-          if (mov.tipo === 'gasto') gastosMes += mov.monto;
+            movimientos.push({ tipo, concepto, monto, fecha: new Date().toLocaleDateString() });
+            localStorage.setItem('movimientos', JSON.stringify(movimientos));
+            actualizarUI();
+            
+            document.getElementById('concepto').value = '';
+            document.getElementById('monto').value = '';
         }
-        if (mov.tipo === 'venta') saldosCalc[mov.metodo] += mov.monto;
-        if (mov.tipo === 'gasto') saldosCalc[mov.metodo] -= mov.monto;
-        if (mov.tipo === 'traspaso') {
-          saldosCalc[mov.metodo] -= mov.monto;
-          saldosCalc[mov.destinoCat] += mov.monto;
+
+        function actualizarUI() {
+            const v = movimientos.filter(m => m.tipo === 'venta').reduce((s, m) => s + m.monto, 0);
+            const g = movimientos.filter(m => m.tipo === 'gasto').reduce((s, m) => s + m.monto, 0);
+
+            document.getElementById('totalVentas').innerText = `$${v.toLocaleString()}`;
+            document.getElementById('totalGastos').innerText = `$${g.toLocaleString()}`;
+            document.getElementById('balance').innerText = `$${(v - g).toLocaleString()}`;
+            
+            renderGrafico(v, g);
         }
-      });
 
-      document.getElementById('ventas-mes').textContent = '$' + ventasMes.toFixed(2);
-      document.getElementById('gastos-mes').textContent = '$' + gastosMes.toFixed(2);
-      document.getElementById('resultado-mes').textContent = '$' + (ventasMes - gastosMes).toFixed(2);
-      document.getElementById('resultado-mes').className = (ventasMes - gastosMes >= 0) ? 'text-3xl font-bold text-green-600' : 'text-3xl font-bold text-red-600';
-
-      const tbody = document.getElementById('saldos-tbody');
-      tbody.innerHTML = '';
-      data.metodos.forEach(met => {
-        const real = parseFloat(localStorage.getItem('real_' + met) || saldosCalc[met]);
-        const diff = real - saldosCalc[met];
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td class="p-3">${met}</td>
-          <td class="p-3">$${saldosCalc[met].toFixed(2)}</td>
-          <td class="p-3">
-            <input type="number" value="${real.toFixed(2)}" step="0.01" class="w-32 p-1 border rounded" onchange="guardarReal('${met}', this.value)"/>
-          </td>
-          <td class="p-3 ${diff >= 0 ? 'text-green-600' : 'text-red-600'}">$${diff.toFixed(2)}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function guardarReal(metodo, valor) {
-      localStorage.setItem('real_' + metodo, valor);
-      actualizarDashboard();
-    }
-
-    // Formularios
-    document.getElementById('form-venta').addEventListener('submit', e => {
-      e.preventDefault();
-      const mov = {
-        fecha: new Date().toISOString().slice(0,10),
-        tipo: 'venta',
-        monto: parseFloat(document.getElementById('venta-monto').value),
-        metodo: document.getElementById('venta-metodo').value,
-        destinoCat: '-',
-        notas: document.getElementById('venta-notas').value
-      };
-      data.movimientos.push(mov);
-      saveData();
-      alert('Venta guardada');
-      e.target.reset();
-    });
-
-    document.getElementById('form-gasto').addEventListener('submit', e => {
-      e.preventDefault();
-      const mov = {
-        fecha: new Date().toISOString().slice(0,10),
-        tipo: 'gasto',
-        monto: parseFloat(document.getElementById('gasto-monto').value),
-        metodo: document.getElementById('gasto-metodo').value,
-        destinoCat: document.getElementById('gasto-categoria').value,
-        notas: document.getElementById('gasto-notas').value
-      };
-      data.movimientos.push(mov);
-      saveData();
-      alert('Gasto guardado');
-      e.target.reset();
-    });
-
-    document.getElementById('form-traspaso').addEventListener('submit', e => {
-      e.preventDefault();
-      const mov = {
-        fecha: new Date().toISOString().slice(0,10),
-        tipo: 'traspaso',
-        monto: parseFloat(document.getElementById('traspaso-monto').value),
-        metodo: document.getElementById('traspaso-origen').value,
-        destinoCat: document.getElementById('traspaso-destino').value,
-        notas: 'Traspaso'
-      };
-      data.movimientos.push(mov);
-      saveData();
-      alert('Traspaso guardado');
-      e.target.reset();
-    });
-
-    // Filtros y listas
-    function actualizarHistorial() {
-      const mes = document.getElementById('filtro-mes').value || new Date().toISOString().slice(0,7);
-      const tbody = document.getElementById('historial-tbody');
-      tbody.innerHTML = '';
-      data.movimientos
-        .filter(m => m.fecha.startsWith(mes))
-        .forEach(mov => {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td class="p-3">${mov.fecha}</td>
-            <td class="p-3">${mov.tipo}</td>
-            <td class="p-3 ${mov.tipo==='gasto'?'text-red-600':mov.tipo==='venta'?'text-green-600':''}">$${mov.monto.toFixed(2)}</td>
-            <td class="p-3">${mov.metodo}</td>
-            <td class="p-3">${mov.destinoCat}</td>
-            <td class="p-3">${mov.notas}</td>
-          `;
-          tbody.appendChild(tr);
-        });
-    }
-
-    document.getElementById('filtro-mes').addEventListener('change', actualizarHistorial);
-
-    function actualizarMaestros() {
-      const lm = document.getElementById('lista-metodos');
-      lm.innerHTML = '';
-      data.metodos.forEach(m => {
-        const li = document.createElement('li');
-        li.textContent = m;
-        lm.appendChild(li);
-      });
-
-      const lc = document.getElementById('lista-categorias');
-      lc.innerHTML = '';
-      data.categorias.forEach(c => {
-        const li = document.createElement('li');
-        li.textContent = c;
-        lc.appendChild(li);
-      });
-    }
-
-    function agregarMetodo() {
-      const val = document.getElementById('nuevo-metodo').value.trim();
-      if (val && !data.metodos.includes(val)) {
-        data.metodos.push(val);
-        saveData();
-        actualizarMaestros();
-        actualizarSelects();
-        document.getElementById('nuevo-metodo').value = '';
-      }
-    }
-
-    function agregarCategoria() {
-      const val = document.getElementById('nueva-categoria').value.trim();
-      if (val && !data.categorias.includes(val)) {
-        data.categorias.push(val);
-        saveData();
-        actualizarMaestros();
-        actualizarSelects();
-        document.getElementById('nueva-categoria').value = '';
-      }
-    }
-
-    function actualizarSelects() {
-      ['venta-metodo', 'gasto-metodo', 'traspaso-origen', 'traspaso-destino'].forEach(id => {
-        const sel = document.getElementById(id);
-        sel.innerHTML = '';
-        data.metodos.forEach(m => {
-          const opt = document.createElement('option');
-          opt.value = m;
-          opt.textContent = m;
-          sel.appendChild(opt);
-        });
-      });
-
-      const selCat = document.getElementById('gasto-categoria');
-      selCat.innerHTML = '';
-      data.categorias.forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = c;
-        opt.textContent = c;
-        selCat.appendChild(opt);
-      });
-    }
-
-    // Exportar / Importar
-    function exportData() {
-      const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'stella-maris-backup.json';
-      a.click();
-    }
-
-    function importData() {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = '.json';
-      input.onchange = e => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onload = ev => {
-          try {
-            const imported = JSON.parse(ev.target.result);
-            data = imported;
-            saveData();
-            alert('Datos importados correctamente');
-            location.reload();
-          } catch(err) {
-            alert('Error al importar: ' + err.message);
-          }
-        };
-        reader.readAsText(file);
-      };
-      input.click();
-    }
-
-    // Inicializar
-    actualizarSelects();
-    actualizarDashboard();
-    actualizarMaestros();
-    actualizarHistorial();
-  </script>
+        function renderGrafico(v, g) {
+            const ctx = document.getElementById('graficoVentas').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Ingresos', 'Gastos'],
+                    datasets: [{
+                        label: 'Balance General',
+                        data: [v, g],
+                        backgroundColor: ['#22c55e', '#ef4444']
+                    }]
+                }
+            });
+        }
+        actualizarUI();
+    </script>
 </body>
 </html>
