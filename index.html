@@ -3,267 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Stella Maris - Gestión</title>
+    <title>Stella Maris | Gestión Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap');
         body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #0f172a; 
-            color: #f8fafc;
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: #0a0c10; 
+            color: #e2e8f0;
             -webkit-tap-highlight-color: transparent;
         }
-        .card-dark { background: #1e293b; border-radius: 1.5rem; border: 1px solid #334155; }
-        .input-dark { 
-            background: #0f172a; 
-            border: 1px solid #334155; 
-            border-radius: 0.75rem; 
-            padding: 1rem; 
+        .app-card { background: #161b22; border: 1px solid #30363d; border-radius: 1.25rem; }
+        .input-field { 
+            background: #0d1117; 
+            border: 1px solid #30363d; 
+            border-radius: 0.8rem; 
+            padding: 0.9rem; 
             width: 100%;
-            outline: none;
             color: white;
+            font-weight: 500;
+            outline: none;
         }
-        .input-dark:focus { border-color: #6366f1; }
-        .btn-top { background: #334155; padding: 0.5rem 1rem; border-radius: 0.75rem; font-size: 0.8rem; font-weight: bold; }
-        .btn-primary { background: #312e81; padding: 1rem; border-radius: 1rem; font-weight: bold; text-align: center; width: 100%; }
-        .btn-secondary { background: #1e293b; border: 1px solid #334155; padding: 1rem; border-radius: 1rem; font-weight: bold; text-align: center; width: 100%; }
-        .tab-active { color: #818cf8; border-bottom: 2px solid #818cf8; }
-        .hide-scroll::-webkit-scrollbar { display: none; }
+        .input-field:focus { border-color: #58a6ff; }
+        .btn-action { background: #21262d; padding: 0.6rem 0.8rem; border-radius: 0.6rem; font-size: 0.75rem; font-weight: 700; border: 1px solid #30363d; }
+        .btn-submit { background: #238636; color: white; padding: 1rem; border-radius: 1rem; font-weight: 800; width: 100%; transition: opacity 0.2s; }
+        .btn-submit:active { opacity: 0.7; }
+        .tab-nav { color: #8b949e; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+        .tab-active { color: #58a6ff; }
     </style>
 </head>
-<body class="pb-24">
+<body class="pb-28">
 
-    <header class="p-6 space-y-4">
-        <div class="flex justify-between items-start">
-            <div>
-                <h1 class="text-xl font-bold leading-tight">Stella Maris •<br>Gestión</h1>
-                <p id="sub-title" class="text-xs text-slate-400 mt-1">Cargar Gastos</p>
-            </div>
-            <div class="grid grid-cols-2 gap-2">
-                <button onclick="nav('home')" class="btn-top">Home</button>
-                <button onclick="deshacer()" class="btn-top">Deshacer</button>
-                <button onclick="exportData()" class="btn-top">Exportar</button>
-                <button onclick="importData()" class="btn-top">Importar</button>
+    <header class="p-5 flex justify-between items-center sticky top-0 bg-[#0a0c10]/80 backdrop-blur-md z-50">
+        <div>
+            <h1 class="text-lg font-extrabold tracking-tight">Stella Maris</h1>
+            <div class="flex items-center gap-1">
+                <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                <p id="view-indicator" class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Dashboard</p>
             </div>
         </div>
-
-        <div class="card-dark p-4 flex justify-between items-center">
-            <div>
-                <p class="text-[10px] text-slate-400 uppercase font-bold">Estado Actual</p>
-                <p id="top-balance" class="text-lg font-bold text-indigo-400">$ 0</p>
-            </div>
-            <button onclick="nav('add')" class="bg-indigo-900/50 text-indigo-300 px-4 py-2 rounded-xl text-xs font-bold border border-indigo-500/30">Editar lo último</button>
+        <div class="flex gap-2">
+            <button onclick="deshacer()" class="btn-action">Deshacer</button>
+            <button onclick="exportData()" class="btn-action"><i class="fas fa-download"></i></button>
         </div>
     </header>
 
-    <main class="px-6 space-y-6">
+    <main class="px-5 space-y-6">
 
         <section id="view-home" class="view space-y-4">
-            <h3 class="text-sm font-bold text-slate-400 px-1">Disponibilidad</h3>
-            <div id="wallet-container" class="grid grid-cols-1 gap-3"></div>
+            <div class="app-card p-6 bg-gradient-to-br from-[#161b22] to-[#0d1117]">
+                <p class="text-[10px] font-black text-slate-500 uppercase mb-1">Capital Disponible</p>
+                <h2 id="main-balance" class="text-3xl font-black text-white">$ 0</h2>
+            </div>
+            <div id="wallet-list" class="space-y-2"></div>
         </section>
 
-        <section id="view-add" class="view hidden space-y-4">
-            <div class="flex gap-4 mb-2 border-b border-slate-800 pb-2">
-                <button onclick="setMode('Gasto')" id="t-gasto" class="text-sm font-bold tab-active">Cargar Gastos</button>
-                <button onclick="setMode('Venta')" id="t-venta" class="text-sm font-bold text-slate-500">Cargar Ventas</button>
-            </div>
-
-            <div class="card-dark p-6 space-y-5">
-                <div class="space-y-1">
-                    <label class="text-xs text-slate-400 ml-1">Fecha</label>
-                    <input type="date" id="in-fecha" class="input-dark">
-                </div>
-
-                <div id="div-cat" class="space-y-1">
-                    <label class="text-xs text-slate-400 ml-1">Categoría</label>
-                    <select id="in-cat" onchange="updateSubMaestros()" class="input-dark"></select>
-                </div>
-
-                <div id="div-sub" class="space-y-1">
-                    <label class="text-xs text-slate-400 ml-1">Subcategoría (o Persona)</label>
-                    <div id="sub-input-wrapper">
-                        </div>
-                </div>
-
-                <div class="space-y-1">
-                    <label class="text-xs text-slate-400 ml-1">Monto</label>
+        <section id="view-ventas" class="view hidden space-y-4">
+            <div class="app-card p-6 space-y-4">
+                <h3 class="text-sm font-black text-blue-400 uppercase">Nueva Venta</h3>
+                <div class="space-y-4">
+                    <input type="date" id="v-fecha" class="input-field">
+                    <select id="v-wallet" class="input-field"></select>
                     <div class="relative">
-                        <span class="absolute left-4 top-4 text-slate-500">$</span>
-                        <input type="number" id="in-monto" inputmode="decimal" placeholder="0" class="input-dark pl-8 text-xl font-bold">
+                        <span class="absolute left-4 top-4 text-slate-500 font-bold">$</span>
+                        <input type="number" id="v-monto" inputmode="decimal" placeholder="Monto total" class="input-field pl-8 text-xl font-black">
                     </div>
+                    <button onclick="saveVenta()" class="btn-submit !bg-blue-600">Guardar Venta</button>
                 </div>
+            </div>
+        </section>
 
-                <div id="div-estado" class="space-y-1">
-                    <label class="text-xs text-slate-400 ml-1">Estado</label>
-                    <select id="in-estado" class="input-dark">
+        <section id="view-gastos" class="view hidden space-y-4">
+            <div class="app-card p-6 space-y-4">
+                <h3 class="text-sm font-black text-red-400 uppercase">Nuevo Gasto</h3>
+                <div class="space-y-4">
+                    <input type="date" id="g-fecha" class="input-field">
+                    <select id="g-cat" onchange="loadSubs()" class="input-field"></select>
+                    <select id="g-sub" class="input-field"></select>
+                    <div class="relative">
+                        <span class="absolute left-4 top-4 text-slate-500 font-bold">$</span>
+                        <input type="number" id="g-monto" inputmode="decimal" placeholder="Monto" class="input-field pl-8 text-xl font-black">
+                    </div>
+                    <select id="g-wallet" class="input-field"></select>
+                    <select id="g-estado" class="input-field">
                         <option value="Pagado">Pagado</option>
                         <option value="Pendiente" selected>Pendiente</option>
                     </select>
-                </div>
-
-                <div class="space-y-1">
-                    <label class="text-xs text-slate-400 ml-1">Método (si Pagado)</label>
-                    <select id="in-wallet" class="input-dark"></select>
-                </div>
-
-                <div class="space-y-1">
-                    <label class="text-xs text-slate-400 ml-1">Nota (opcional)</label>
-                    <input type="text" id="in-nota" placeholder="Ej: flete, hielo..." class="input-dark">
-                </div>
-
-                <div class="pt-4 space-y-3">
-                    <button onclick="saveData()" id="btn-save" class="btn-primary">Guardar Gasto</button>
-                    <button onclick="nav('home')" class="btn-secondary">Volver</button>
+                    <button onclick="saveGasto()" class="btn-submit !bg-red-600">Guardar Gasto</button>
                 </div>
             </div>
         </section>
 
         <section id="view-hitos" class="view hidden space-y-4">
             <div class="flex gap-2">
-                <input type="text" id="h-search" onkeyup="renderHitos()" placeholder="Buscar..." class="input-dark p-2 text-sm">
-                <select id="h-filter" onchange="renderHitos()" class="input-dark p-2 text-xs w-1/3"></select>
+                <input type="text" id="h-search" onkeyup="renderHitos()" placeholder="Buscar..." class="input-field !p-2 text-sm">
+                <select id="h-filter" onchange="renderHitos()" class="input-field !p-2 text-xs w-1/3">
+                    <option value="All">Todo</option>
+                    <option value="Venta">Ventas</option>
+                    <option value="Gasto">Gastos</option>
+                </select>
             </div>
-            <div id="hitos-list" class="space-y-3"></div>
+            <div id="hitos-list" class="space-y-2"></div>
         </section>
 
         <section id="view-pendientes" class="view hidden space-y-3">
-            <div id="pendientes-list" class="space-y-3"></div>
-        </section>
-
-        <section id="view-config" class="view hidden space-y-6">
-            <div class="card-dark p-5 space-y-4">
-                <h3 class="font-bold">Configurar Maestros</h3>
-                <input id="m-cat-new" type="text" placeholder="Nueva Categoría" class="input-dark">
-                <button onclick="addMaestro('categories', 'm-cat-new')" class="btn-primary py-2 text-sm">Añadir Categoría</button>
-                <div class="border-t border-slate-700 pt-4">
-                    <input id="m-sub-new" type="text" placeholder="Sub-item para la cat elegida" class="input-dark">
-                    <button onclick="addSubMaestro()" class="btn-secondary py-2 text-sm mt-2">Vincular Sub-item</button>
-                </div>
-                <div class="border-t border-slate-700 pt-4">
-                    <input id="m-wall-new" type="text" placeholder="Nuevo Banco/Caja" class="input-dark">
-                    <button onclick="addMaestro('wallets', 'm-wall-new')" class="btn-primary py-2 text-sm mt-2">Añadir Método</button>
-                </div>
-            </div>
+            <div id="pendientes-list" class="space-y-2"></div>
         </section>
 
     </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-[#0f172a]/90 backdrop-blur-md border-t border-slate-800 px-6 py-4 flex justify-between items-center z-50">
-        <button onclick="nav('home')" id="nav-home" class="text-slate-500 flex flex-col items-center gap-1"><i class="fas fa-wallet"></i><span class="text-[9px] font-bold uppercase">Saldos</span></button>
-        <button onclick="nav('hitos')" id="nav-hitos" class="text-slate-500 flex flex-col items-center gap-1"><i class="fas fa-history"></i><span class="text-[9px] font-bold uppercase">Hitos</span></button>
-        <button onclick="nav('add')" class="bg-indigo-600 w-12 h-12 rounded-full text-white flex items-center justify-center -mt-12 shadow-xl border-4 border-[#0f172a]"><i class="fas fa-plus"></i></button>
-        <button onclick="nav('pendientes')" id="nav-pendientes" class="text-slate-500 flex flex-col items-center gap-1"><i class="fas fa-user-clock"></i><span class="text-[9px] font-bold uppercase">Deudas</span></button>
-        <button onclick="nav('config')" id="nav-config" class="text-slate-500 flex flex-col items-center gap-1"><i class="fas fa-cog"></i><span class="text-[9px] font-bold uppercase">Maestros</span></button>
+    <nav class="fixed bottom-0 left-0 right-0 bg-[#0d1117] border-t border-[#30363d] p-4 flex justify-around items-center z-50">
+        <button onclick="nav('home')" class="tab-nav flex flex-col items-center gap-1"><i class="fas fa-chart-pie text-lg"></i><span>Saldos</span></button>
+        <button onclick="nav('ventas')" class="tab-nav flex flex-col items-center gap-1"><i class="fas fa-plus-circle text-lg text-blue-500"></i><span>Venta</span></button>
+        <button onclick="nav('gastos')" class="tab-nav flex flex-col items-center gap-1"><i class="fas fa-minus-circle text-lg text-red-500"></i><span>Gasto</span></button>
+        <button onclick="nav('hitos')" class="tab-nav flex flex-col items-center gap-1"><i class="fas fa-list text-lg"></i><span>Hitos</span></button>
+        <button onclick="nav('pendientes')" class="tab-nav flex flex-col items-center gap-1"><i class="fas fa-user-clock text-lg"></i><span>Deudas</span></button>
     </nav>
 
     <script>
-        let db = JSON.parse(localStorage.getItem('sm_gest_v1')) || {
-            categories: ['Proveedores', 'Impuestos', 'Sueldos'],
-            subcategories: { 'Proveedores': ['Juan', 'Distribuidora X'], 'Impuestos': ['Luz', 'Gas'] },
+        let db = JSON.parse(localStorage.getItem('sm_pro_v2')) || {
+            categories: ['Proveedores', 'Impuestos', 'Servicios', 'Sueldos'],
+            subcategories: { 'Proveedores': ['Juan', 'Distribuidora'], 'Impuestos': ['Luz', 'Gas'] },
             wallets: ['Efectivo', 'Mercado Pago', 'Brubank'],
             movs: []
         };
 
-        let mode = 'Gasto';
-
         function nav(v) {
             document.querySelectorAll('.view').forEach(e => e.classList.add('hidden'));
-            document.querySelectorAll('nav button').forEach(e => e.classList.remove('tab-active', 'text-indigo-400'));
+            document.querySelectorAll('.tab-nav').forEach(e => e.classList.remove('tab-active'));
             document.getElementById('view-' + v).classList.remove('hidden');
-            const btn = document.getElementById('nav-' + v);
-            if(btn) btn.classList.add('tab-active', 'text-indigo-400');
+            document.getElementById('view-indicator').innerText = v;
             
             if(v === 'home') renderHome();
             if(v === 'hitos') renderHitos();
             if(v === 'pendientes') renderPendientes();
-            if(v === 'add') { renderSelects(); document.getElementById('in-fecha').valueAsDate = new Date(); }
+            if(v === 'ventas' || v === 'gastos') setupForm();
         }
 
-        function setMode(m) {
-            mode = m;
-            document.getElementById('t-gasto').className = m === 'Gasto' ? 'text-sm font-bold tab-active' : 'text-sm font-bold text-slate-500';
-            document.getElementById('t-venta').className = m === 'Venta' ? 'text-sm font-bold tab-active' : 'text-sm font-bold text-slate-500';
-            document.getElementById('sub-title').innerText = 'Cargar ' + m + 's';
-            document.getElementById('btn-save').innerText = 'Guardar ' + m;
+        function setupForm() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('v-fecha').value = today;
+            document.getElementById('g-fecha').value = today;
             
-            const subWrapper = document.getElementById('sub-input-wrapper');
-            if(m === 'Venta') {
-                document.getElementById('div-cat').classList.add('hidden');
-                document.getElementById('div-estado').classList.add('hidden');
-                subWrapper.innerHTML = `<input id="in-subcat" type="text" placeholder="Nombre cliente (opcional)" class="input-dark">`;
-            } else {
-                document.getElementById('div-cat').classList.remove('hidden');
-                document.getElementById('div-estado').classList.remove('hidden');
-                subWrapper.innerHTML = `<select id="in-subcat" class="input-dark"></select>`;
-                updateSubMaestros();
-            }
+            const wHtml = db.wallets.map(w => `<option value="${w}">${w}</option>`).join('');
+            document.getElementById('v-wallet').innerHTML = wHtml;
+            document.getElementById('g-wallet').innerHTML = wHtml;
+            
+            document.getElementById('g-cat').innerHTML = db.categories.map(c => `<option value="${c}">${c}</option>`).join('');
+            loadSubs();
         }
 
-        function renderSelects() {
-            document.getElementById('in-cat').innerHTML = db.categories.map(c => `<option value="${c}">${c}</option>`).join('');
-            document.getElementById('in-wallet').innerHTML = db.wallets.map(w => `<option value="${w}">${w}</option>`).join('');
-            document.getElementById('h-filter').innerHTML = '<option value="All">Todos</option>' + db.categories.map(c => `<option value="${c}">${c}</option>`).join('');
-            setMode(mode);
+        function loadSubs() {
+            const cat = document.getElementById('g-cat').value;
+            const subs = db.subcategories[cat] || ['General'];
+            document.getElementById('g-sub').innerHTML = subs.map(s => `<option value="${s}">${s}</option>`).join('');
         }
 
-        function updateSubMaestros() {
-            if(mode === 'Venta') return;
-            const cat = document.getElementById('in-cat').value;
-            const subs = db.subcategories[cat] || [];
-            document.getElementById('in-subcat').innerHTML = subs.map(s => `<option value="${s}">${s}</option>`).join('') || '<option value="General">General</option>';
-        }
-
-        function saveData() {
-            const monto = parseFloat(document.getElementById('in-monto').value);
-            const subcat = document.getElementById('in-subcat').value || 'Venta Directa';
-            if(isNaN(monto)) return alert("Ingresá un monto");
-
-            const mov = {
-                id: Date.now(),
-                fecha: document.getElementById('in-fecha').value,
-                tipo: mode,
-                cat: mode === 'Venta' ? 'Ingresos' : document.getElementById('in-cat').value,
-                subcat: subcat,
-                monto: monto,
-                estado: mode === 'Venta' ? 'Pagado' : document.getElementById('in-estado').value,
-                wallet: document.getElementById('in-wallet').value,
-                nota: document.getElementById('in-nota').value
-            };
-
+        function saveVenta() {
+            const monto = parseFloat(document.getElementById('v-monto').value);
+            if(isNaN(monto)) return;
+            const mov = { id: Date.now(), fecha: document.getElementById('v-fecha').value, tipo: 'Venta', subcat: 'Venta Directa', monto, wallet: document.getElementById('v-wallet').value, estado: 'Pagado' };
             db.movs.unshift(mov);
-            save();
-            document.getElementById('in-monto').value = '';
-            document.getElementById('in-nota').value = '';
-            nav('home');
+            save(); nav('home');
+        }
+
+        function saveGasto() {
+            const monto = parseFloat(document.getElementById('g-monto').value);
+            if(isNaN(monto)) return;
+            const mov = { id: Date.now(), fecha: document.getElementById('g-fecha').value, tipo: 'Gasto', cat: document.getElementById('g-cat').value, subcat: document.getElementById('g-sub').value, monto, wallet: document.getElementById('g-wallet').value, estado: document.getElementById('g-estado').value };
+            db.movs.unshift(mov);
+            save(); nav('home');
         }
 
         function formatM(n) { return '$ ' + n.toLocaleString('es-AR'); }
 
         function renderHome() {
             const total = db.movs.filter(m => m.estado === 'Pagado').reduce((acc, m) => m.tipo === 'Venta' ? acc + m.monto : acc - m.monto, 0);
-            document.getElementById('top-balance').innerText = formatM(total);
-
-            document.getElementById('wallet-container').innerHTML = db.wallets.map(w => {
+            document.getElementById('main-balance').innerText = formatM(total);
+            document.getElementById('wallet-list').innerHTML = db.wallets.map(w => {
                 const s = db.movs.filter(m => m.wallet === w && m.estado === 'Pagado').reduce((acc, m) => m.tipo === 'Venta' ? acc + m.monto : acc - m.monto, 0);
-                return `<div class="card-dark p-4 flex justify-between items-center">
-                    <span class="text-xs font-bold text-slate-300">${w}</span>
-                    <span class="font-bold ${s >= 0 ? 'text-indigo-400' : 'text-red-400'}">${formatM(s)}</span>
+                return `<div class="app-card p-4 flex justify-between items-center">
+                    <span class="text-xs font-bold text-slate-400">${w}</span>
+                    <span class="font-bold ${s >= 0 ? 'text-blue-400' : 'text-red-400'}">${formatM(s)}</span>
                 </div>`;
             }).join('');
         }
 
         function renderHitos() {
             const search = document.getElementById('h-search').value.toLowerCase();
-            const filtered = db.movs.filter(m => m.subcat.toLowerCase().includes(search) || m.nota.toLowerCase().includes(search));
-            document.getElementById('hitos-list').innerHTML = filtered.map(m => `
-                <div class="card-dark p-4 flex justify-between items-center border-l-4 ${m.tipo === 'Venta' ? 'border-green-500' : 'border-red-500'}">
+            const filter = document.getElementById('h-filter').value;
+            const list = db.movs.filter(m => (filter === 'All' || m.tipo === filter) && m.subcat.toLowerCase().includes(search));
+            
+            document.getElementById('hitos-list').innerHTML = list.map(m => `
+                <div class="app-card p-4 flex justify-between items-center">
                     <div>
-                        <p class="text-xs font-bold">${m.subcat}</p>
-                        <p class="text-[10px] text-slate-500">${m.fecha} • ${m.wallet} ${m.estado === 'Pendiente' ? '• (PEND)' : ''}</p>
+                        <p class="text-xs font-bold text-white">${m.subcat}</p>
+                        <p class="text-[9px] text-slate-500 uppercase font-bold">${m.fecha} • ${m.wallet}</p>
                     </div>
-                    <p class="font-bold ${m.tipo === 'Venta' ? 'text-green-400' : 'text-red-400'}">${m.tipo === 'Venta' ? '+' : '-'}${formatM(m.monto)}</p>
+                    <p class="font-bold ${m.tipo === 'Venta' ? 'text-blue-400' : 'text-red-400'}">${m.tipo === 'Venta' ? '+' : '-'}${formatM(m.monto)}</p>
                 </div>
             `).join('');
         }
@@ -274,47 +212,22 @@
                 if(!saldos[m.subcat]) saldos[m.subcat] = 0;
                 saldos[m.subcat] += (m.tipo === 'Venta' ? m.monto : -m.monto);
             });
-
-            const list = document.getElementById('pendientes-list');
-            list.innerHTML = Object.keys(saldos).map(persona => {
-                const s = saldos[persona];
-                if(s === 0) return '';
-                return `<div class="card-dark p-4 flex justify-between items-center">
-                    <span class="font-bold text-sm">${persona}</span>
-                    <div class="text-right">
-                        <p class="text-[10px] uppercase font-bold text-slate-500">${s > 0 ? 'Me debe' : 'Le debo'}</p>
-                        <p class="font-black ${s > 0 ? 'text-green-400' : 'text-red-400'}">${formatM(Math.abs(s))}</p>
-                    </div>
+            document.getElementById('pendientes-list').innerHTML = Object.keys(saldos).map(p => {
+                const s = saldos[p]; if(s === 0) return '';
+                return `<div class="app-card p-4 flex justify-between items-center">
+                    <span class="font-bold text-sm">${p}</span>
+                    <p class="font-black ${s > 0 ? 'text-blue-400' : 'text-red-400'}">${s > 0 ? 'ME DEBE' : 'DEBO'} ${formatM(Math.abs(s))}</p>
                 </div>`;
             }).join('');
-            if(list.innerHTML === "") list.innerHTML = '<p class="text-center text-slate-500 text-sm mt-10">No hay deudas pendientes</p>';
         }
 
-        function addMaestro(key, id) {
-            const v = document.getElementById(id).value.trim();
-            if(v) {
-                db[key].push(v);
-                if(key === 'categories') db.subcategories[v] = [];
-                save(); alert("Añadido"); document.getElementById(id).value = '';
-            }
-        }
-
-        function addSubMaestro() {
-            const cat = document.getElementById('in-cat').value;
-            const sub = document.getElementById('m-sub-new').value.trim();
-            if(sub) {
-                if(!db.subcategories[cat]) db.subcategories[cat] = [];
-                db.subcategories[cat].push(sub);
-                save(); alert("Vinculado a " + cat); document.getElementById('m-sub-new').value = '';
-            }
-        }
-
-        function save() { localStorage.setItem('sm_gest_v1', JSON.stringify(db)); }
+        function save() { localStorage.setItem('sm_pro_v2', JSON.stringify(db)); }
         function exportData() {
-            const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
-            const a = document.createElement('a'); a.href = data; a.download = "backup_stella.json"; a.click();
+            const a = document.createElement('a');
+            a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
+            a.download = "stella_maris_backup.json"; a.click();
         }
-        function deshacer() { if(confirm("¿Eliminar el último movimiento?")) { db.movs.shift(); save(); renderHome(); } }
+        function deshacer() { if(confirm("¿Borrar último?")) { db.movs.shift(); save(); nav('home'); } }
 
         window.onload = () => nav('home');
     </script>
