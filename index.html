@@ -3,345 +3,318 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Business OS | Premium v3</title>
+    <title>Stella Maris - Gestión</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; background: #f1f5f9; }
-        .tab-active { color: #4f46e5; border-top: 3px solid #4f46e5; background: #f8fafc; }
-        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
-        input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #0f172a; 
+            color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .card-dark { background: #1e293b; border-radius: 1.5rem; border: 1px solid #334155; }
+        .input-dark { 
+            background: #0f172a; 
+            border: 1px solid #334155; 
+            border-radius: 0.75rem; 
+            padding: 1rem; 
+            width: 100%;
+            outline: none;
+            color: white;
+        }
+        .input-dark:focus { border-color: #6366f1; }
+        .btn-top { background: #334155; padding: 0.5rem 1rem; border-radius: 0.75rem; font-size: 0.8rem; font-weight: bold; }
+        .btn-primary { background: #312e81; padding: 1rem; border-radius: 1rem; font-weight: bold; text-align: center; width: 100%; }
+        .btn-secondary { background: #1e293b; border: 1px solid #334155; padding: 1rem; border-radius: 1rem; font-weight: bold; text-align: center; width: 100%; }
+        .tab-active { color: #818cf8; border-bottom: 2px solid #818cf8; }
+        .hide-scroll::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="text-slate-900">
+<body class="pb-24">
 
-    <header class="glass sticky top-0 z-50 px-6 py-4 flex justify-between items-center border-b border-slate-200">
-        <div>
-            <h1 class="text-xl font-black text-indigo-900">BusinessOS</h1>
-            <p id="current-view-title" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Dashboard</p>
+    <header class="p-6 space-y-4">
+        <div class="flex justify-between items-start">
+            <div>
+                <h1 class="text-xl font-bold leading-tight">Stella Maris •<br>Gestión</h1>
+                <p id="sub-title" class="text-xs text-slate-400 mt-1">Cargar Gastos</p>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="nav('home')" class="btn-top">Home</button>
+                <button onclick="deshacer()" class="btn-top">Deshacer</button>
+                <button onclick="exportData()" class="btn-top">Exportar</button>
+                <button onclick="importData()" class="btn-top">Importar</button>
+            </div>
         </div>
-        <div class="flex gap-2">
-            <button onclick="exportData()" class="p-2 text-slate-400"><i class="fas fa-cloud-download"></i></button>
-            <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold">MP</div>
+
+        <div class="card-dark p-4 flex justify-between items-center">
+            <div>
+                <p class="text-[10px] text-slate-400 uppercase font-bold">Estado Actual</p>
+                <p id="top-balance" class="text-lg font-bold text-indigo-400">$ 0</p>
+            </div>
+            <button onclick="nav('add')" class="bg-indigo-900/50 text-indigo-300 px-4 py-2 rounded-xl text-xs font-bold border border-indigo-500/30">Editar lo último</button>
         </div>
     </header>
 
-    <main class="max-w-md mx-auto px-4 pt-6 pb-32">
-        
-        <section id="view-home" class="view space-y-6">
-            <div class="bg-indigo-700 p-6 rounded-[2.5rem] text-white shadow-2xl shadow-indigo-200">
-                <p class="opacity-70 text-xs font-bold">DISPONIBILIDAD TOTAL</p>
-                <h2 id="total-balance" class="text-4xl font-black mt-1">$ 0,00</h2>
-                <div class="grid grid-cols-2 gap-4 mt-6">
-                    <div class="bg-white/10 p-3 rounded-2xl">
-                        <p class="text-[10px] uppercase opacity-60">Ventas Hoy</p>
-                        <p id="ingresos-hoy" class="font-bold text-lg">+$0</p>
-                    </div>
-                    <div class="bg-white/10 p-3 rounded-2xl">
-                        <p class="text-[10px] uppercase opacity-60">Gastos Hoy</p>
-                        <p id="gastos-hoy" class="font-bold text-lg">-$0</p>
-                    </div>
-                </div>
-            </div>
+    <main class="px-6 space-y-6">
 
-            <div id="wallet-container" class="grid grid-cols-2 gap-3">
-                </div>
+        <section id="view-home" class="view space-y-4">
+            <h3 class="text-sm font-bold text-slate-400 px-1">Disponibilidad</h3>
+            <div id="wallet-container" class="grid grid-cols-1 gap-3"></div>
         </section>
 
-        <section id="view-add" class="view hidden">
-            <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
-                <div class="flex p-1 bg-slate-100 rounded-2xl mb-6">
-                    <button onclick="setMode('Venta')" id="mode-venta" class="flex-1 py-3 rounded-xl font-bold transition">VENTA</button>
-                    <button onclick="setMode('Gasto')" id="mode-gasto" class="flex-1 py-3 rounded-xl font-bold transition">GASTO</button>
+        <section id="view-add" class="view hidden space-y-4">
+            <div class="flex gap-4 mb-2 border-b border-slate-800 pb-2">
+                <button onclick="setMode('Gasto')" id="t-gasto" class="text-sm font-bold tab-active">Cargar Gastos</button>
+                <button onclick="setMode('Venta')" id="t-venta" class="text-sm font-bold text-slate-500">Cargar Ventas</button>
+            </div>
+
+            <div class="card-dark p-6 space-y-5">
+                <div class="space-y-1">
+                    <label class="text-xs text-slate-400 ml-1">Fecha</label>
+                    <input type="date" id="in-fecha" class="input-dark">
                 </div>
 
-                <div class="space-y-4">
-                    <div id="input-concept-container" class="space-y-1">
-                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">Detalle / Persona</label>
-                        <div id="wrapper-detalle">
-                            <input id="in-concepto" type="text" placeholder="Ej: Juan Pérez" class="w-full p-4 rounded-2xl bg-slate-50 border-none outline-none font-bold">
-                        </div>
-                    </div>
+                <div id="div-cat" class="space-y-1">
+                    <label class="text-xs text-slate-400 ml-1">Categoría</label>
+                    <select id="in-cat" onchange="updateSubMaestros()" class="input-dark"></select>
+                </div>
 
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="space-y-1">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">Categoría</label>
-                            <select id="in-cat" onchange="actualizarSubcats()" class="w-full p-4 rounded-2xl bg-slate-50 border-none font-bold text-sm outline-none"></select>
+                <div id="div-sub" class="space-y-1">
+                    <label class="text-xs text-slate-400 ml-1">Subcategoría (o Persona)</label>
+                    <div id="sub-input-wrapper">
                         </div>
-                        <div id="subcat-div" class="space-y-1">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">Ítem (Maestro)</label>
-                            <select id="in-subcat" class="w-full p-4 rounded-2xl bg-slate-50 border-none font-bold text-sm outline-none"></select>
-                        </div>
-                    </div>
+                </div>
 
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="space-y-1">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">Billetera</label>
-                            <select id="in-wallet" class="w-full p-4 rounded-2xl bg-slate-50 border-none font-bold text-sm outline-none"></select>
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">Estado</label>
-                            <select id="in-estado" class="w-full p-4 rounded-2xl bg-slate-50 border-none font-bold text-sm outline-none">
-                                <option value="Pagado">Pagado</option>
-                                <option value="Pendiente">Pendiente</option>
-                            </select>
-                        </div>
+                <div class="space-y-1">
+                    <label class="text-xs text-slate-400 ml-1">Monto</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-4 text-slate-500">$</span>
+                        <input type="number" id="in-monto" inputmode="decimal" placeholder="0" class="input-dark pl-8 text-xl font-bold">
                     </div>
+                </div>
 
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-bold text-slate-400 uppercase ml-2 text-indigo-600">Monto Total</label>
-                        <div class="relative">
-                            <span class="absolute left-4 top-4 font-bold text-slate-400">$</span>
-                            <input id="in-monto" type="number" inputmode="decimal" placeholder="0" class="w-full p-4 pl-8 rounded-2xl bg-slate-50 border-none text-2xl font-black text-indigo-700 outline-none">
-                        </div>
-                    </div>
+                <div id="div-estado" class="space-y-1">
+                    <label class="text-xs text-slate-400 ml-1">Estado</label>
+                    <select id="in-estado" class="input-dark">
+                        <option value="Pagado">Pagado</option>
+                        <option value="Pendiente" selected>Pendiente</option>
+                    </select>
+                </div>
 
-                    <button onclick="saveMovimiento()" class="w-full bg-indigo-600 text-white py-5 rounded-[2rem] font-black shadow-xl shadow-indigo-100 active:scale-95 transition">REGISTRAR</button>
+                <div class="space-y-1">
+                    <label class="text-xs text-slate-400 ml-1">Método (si Pagado)</label>
+                    <select id="in-wallet" class="input-dark"></select>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-xs text-slate-400 ml-1">Nota (opcional)</label>
+                    <input type="text" id="in-nota" placeholder="Ej: flete, hielo..." class="input-dark">
+                </div>
+
+                <div class="pt-4 space-y-3">
+                    <button onclick="saveData()" id="btn-save" class="btn-primary">Guardar Gasto</button>
+                    <button onclick="nav('home')" class="btn-secondary">Volver</button>
                 </div>
             </div>
         </section>
 
         <section id="view-hitos" class="view hidden space-y-4">
-            <div class="flex flex-wrap gap-2">
-                <input type="text" id="h-search" onkeyup="renderHitos()" placeholder="Buscar concepto..." class="flex-1 p-3 rounded-xl bg-white border border-slate-200 outline-none text-sm">
-                <select id="h-filter-cat" onchange="renderHitos()" class="p-3 rounded-xl bg-white border border-slate-200 text-xs font-bold outline-none"></select>
+            <div class="flex gap-2">
+                <input type="text" id="h-search" onkeyup="renderHitos()" placeholder="Buscar..." class="input-dark p-2 text-sm">
+                <select id="h-filter" onchange="renderHitos()" class="input-dark p-2 text-xs w-1/3"></select>
             </div>
             <div id="hitos-list" class="space-y-3"></div>
         </section>
 
-        <section id="view-pendientes" class="view hidden space-y-4">
-            <div class="bg-amber-100 p-4 rounded-2xl text-amber-800 text-sm font-bold flex justify-between">
-                <span>TOTAL DEUDAS</span>
-                <span id="deuda-total-suma">$ 0</span>
-            </div>
-            <div id="pendientes-list" class="space-y-2"></div>
+        <section id="view-pendientes" class="view hidden space-y-3">
+            <div id="pendientes-list" class="space-y-3"></div>
         </section>
 
         <section id="view-config" class="view hidden space-y-6">
-            <div class="bg-white p-5 rounded-3xl border border-slate-100 space-y-4">
-                <h3 class="font-black text-slate-800">Gestionar Maestros</h3>
-                
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400">Categoría</label>
-                    <div class="flex gap-2">
-                        <input id="m-cat-new" type="text" class="flex-1 p-3 rounded-xl bg-slate-50 border-none">
-                        <button onclick="addMaestro('categories', 'm-cat-new')" class="bg-indigo-600 text-white px-4 rounded-xl">+</button>
-                    </div>
+            <div class="card-dark p-5 space-y-4">
+                <h3 class="font-bold">Configurar Maestros</h3>
+                <input id="m-cat-new" type="text" placeholder="Nueva Categoría" class="input-dark">
+                <button onclick="addMaestro('categories', 'm-cat-new')" class="btn-primary py-2 text-sm">Añadir Categoría</button>
+                <div class="border-t border-slate-700 pt-4">
+                    <input id="m-sub-new" type="text" placeholder="Sub-item para la cat elegida" class="input-dark">
+                    <button onclick="addSubMaestro()" class="btn-secondary py-2 text-sm mt-2">Vincular Sub-item</button>
                 </div>
-
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400">Sub-item (Asociar a la cat elegida arriba)</label>
-                    <div class="flex gap-2">
-                        <input id="m-sub-new" type="text" class="flex-1 p-3 rounded-xl bg-slate-50 border-none">
-                        <button onclick="addSubMaestro()" class="bg-slate-800 text-white px-4 rounded-xl">+</button>
-                    </div>
-                </div>
-
-                <div class="pt-4 border-t">
-                    <label class="text-[10px] font-bold text-slate-400">Billetera / Banco</label>
-                    <div class="flex gap-2">
-                        <input id="m-wall-new" type="text" class="flex-1 p-3 rounded-xl bg-slate-50 border-none">
-                        <button onclick="addMaestro('wallets', 'm-wall-new')" class="bg-indigo-600 text-white px-4 rounded-xl">+</button>
-                    </div>
+                <div class="border-t border-slate-700 pt-4">
+                    <input id="m-wall-new" type="text" placeholder="Nuevo Banco/Caja" class="input-dark">
+                    <button onclick="addMaestro('wallets', 'm-wall-new')" class="btn-primary py-2 text-sm mt-2">Añadir Método</button>
                 </div>
             </div>
         </section>
+
     </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 glass border-t border-slate-200 px-6 py-3 flex justify-between items-center safe-bottom shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
-        <button onclick="nav('home')" id="t-home" class="flex flex-col items-center gap-1 text-slate-400 tab-active"><i class="fas fa-home"></i><span class="text-[8px] font-bold uppercase">Saldos</span></button>
-        <button onclick="nav('hitos')" id="t-hitos" class="flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-list-ul"></i><span class="text-[8px] font-bold uppercase">Hitos</span></button>
-        <button onclick="nav('add')" id="t-add" class="bg-indigo-600 w-12 h-12 rounded-full text-white flex items-center justify-center -mt-10 shadow-lg border-4 border-white"><i class="fas fa-plus"></i></button>
-        <button onclick="nav('pendientes')" id="t-pendientes" class="flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-user-clock"></i><span class="text-[8px] font-bold uppercase">Pendientes</span></button>
-        <button onclick="nav('config')" id="t-config" class="flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-cog"></i><span class="text-[8px] font-bold uppercase">Maestros</span></button>
+    <nav class="fixed bottom-0 left-0 right-0 bg-[#0f172a]/90 backdrop-blur-md border-t border-slate-800 px-6 py-4 flex justify-between items-center z-50">
+        <button onclick="nav('home')" id="nav-home" class="text-slate-500 flex flex-col items-center gap-1"><i class="fas fa-wallet"></i><span class="text-[9px] font-bold uppercase">Saldos</span></button>
+        <button onclick="nav('hitos')" id="nav-hitos" class="text-slate-500 flex flex-col items-center gap-1"><i class="fas fa-history"></i><span class="text-[9px] font-bold uppercase">Hitos</span></button>
+        <button onclick="nav('add')" class="bg-indigo-600 w-12 h-12 rounded-full text-white flex items-center justify-center -mt-12 shadow-xl border-4 border-[#0f172a]"><i class="fas fa-plus"></i></button>
+        <button onclick="nav('pendientes')" id="nav-pendientes" class="text-slate-500 flex flex-col items-center gap-1"><i class="fas fa-user-clock"></i><span class="text-[9px] font-bold uppercase">Deudas</span></button>
+        <button onclick="nav('config')" id="nav-config" class="text-slate-500 flex flex-col items-center gap-1"><i class="fas fa-cog"></i><span class="text-[9px] font-bold uppercase">Maestros</span></button>
     </nav>
 
     <script>
-        // --- BASE DE DATOS ---
-        let db = JSON.parse(localStorage.getItem('biz_v4')) || {
-            categories: ['Impuestos', 'Sueldos', 'Mercadería', 'Ventas'],
-            subcategories: { 'Impuestos': ['Luz', 'Gas', 'Internet'], 'Mercadería': ['Proveedor A', 'Proveedor B'] },
+        let db = JSON.parse(localStorage.getItem('sm_gest_v1')) || {
+            categories: ['Proveedores', 'Impuestos', 'Sueldos'],
+            subcategories: { 'Proveedores': ['Juan', 'Distribuidora X'], 'Impuestos': ['Luz', 'Gas'] },
             wallets: ['Efectivo', 'Mercado Pago', 'Brubank'],
             movs: []
         };
 
-        let mode = 'Venta';
+        let mode = 'Gasto';
 
         function nav(v) {
             document.querySelectorAll('.view').forEach(e => e.classList.add('hidden'));
-            document.querySelectorAll('nav button').forEach(e => e.classList.remove('tab-active'));
+            document.querySelectorAll('nav button').forEach(e => e.classList.remove('tab-active', 'text-indigo-400'));
             document.getElementById('view-' + v).classList.remove('hidden');
-            document.getElementById('t-' + v).classList.add('tab-active');
-            document.getElementById('current-view-title').innerText = v;
+            const btn = document.getElementById('nav-' + v);
+            if(btn) btn.classList.add('tab-active', 'text-indigo-400');
+            
             if(v === 'home') renderHome();
             if(v === 'hitos') renderHitos();
             if(v === 'pendientes') renderPendientes();
-            if(v === 'add') renderSelects();
+            if(v === 'add') { renderSelects(); document.getElementById('in-fecha').valueAsDate = new Date(); }
         }
 
         function setMode(m) {
             mode = m;
-            const v = document.getElementById('mode-venta');
-            const g = document.getElementById('mode-gasto');
-            const sub = document.getElementById('subcat-div');
+            document.getElementById('t-gasto').className = m === 'Gasto' ? 'text-sm font-bold tab-active' : 'text-sm font-bold text-slate-500';
+            document.getElementById('t-venta').className = m === 'Venta' ? 'text-sm font-bold tab-active' : 'text-sm font-bold text-slate-500';
+            document.getElementById('sub-title').innerText = 'Cargar ' + m + 's';
+            document.getElementById('btn-save').innerText = 'Guardar ' + m;
+            
+            const subWrapper = document.getElementById('sub-input-wrapper');
             if(m === 'Venta') {
-                v.className = "flex-1 py-3 rounded-xl font-bold bg-white shadow-sm text-indigo-600";
-                g.className = "flex-1 py-3 rounded-xl font-bold text-slate-400";
-                sub.classList.add('hidden');
+                document.getElementById('div-cat').classList.add('hidden');
+                document.getElementById('div-estado').classList.add('hidden');
+                subWrapper.innerHTML = `<input id="in-subcat" type="text" placeholder="Nombre cliente (opcional)" class="input-dark">`;
             } else {
-                g.className = "flex-1 py-3 rounded-xl font-bold bg-white shadow-sm text-red-600";
-                v.className = "flex-1 py-3 rounded-xl font-bold text-slate-400";
-                sub.classList.remove('hidden');
+                document.getElementById('div-cat').classList.remove('hidden');
+                document.getElementById('div-estado').classList.remove('hidden');
+                subWrapper.innerHTML = `<select id="in-subcat" class="input-dark"></select>`;
+                updateSubMaestros();
             }
         }
 
         function renderSelects() {
             document.getElementById('in-cat').innerHTML = db.categories.map(c => `<option value="${c}">${c}</option>`).join('');
             document.getElementById('in-wallet').innerHTML = db.wallets.map(w => `<option value="${w}">${w}</option>`).join('');
-            document.getElementById('h-filter-cat').innerHTML = '<option value="All">Todas</option>' + db.categories.map(c => `<option value="${c}">${c}</option>`).join('');
-            actualizarSubcats();
+            document.getElementById('h-filter').innerHTML = '<option value="All">Todos</option>' + db.categories.map(c => `<option value="${c}">${c}</option>`).join('');
+            setMode(mode);
         }
 
-        function actualizarSubcats() {
+        function updateSubMaestros() {
+            if(mode === 'Venta') return;
             const cat = document.getElementById('in-cat').value;
-            const sub = db.subcategories[cat] || [];
-            document.getElementById('in-subcat').innerHTML = sub.map(s => `<option value="${s}">${s}</option>`).join('') || '<option value="-">-</option>';
+            const subs = db.subcategories[cat] || [];
+            document.getElementById('in-subcat').innerHTML = subs.map(s => `<option value="${s}">${s}</option>`).join('') || '<option value="General">General</option>';
         }
 
-        function saveMovimiento() {
-            const concepto = document.getElementById('in-concepto').value.trim();
+        function saveData() {
             const monto = parseFloat(document.getElementById('in-monto').value);
-            const cat = document.getElementById('in-cat').value;
-            const subcat = mode === 'Gasto' ? document.getElementById('in-subcat').value : '-';
-            
-            if(!concepto || isNaN(monto)) return alert("Error: Concepto y Monto son obligatorios");
+            const subcat = document.getElementById('in-subcat').value || 'Venta Directa';
+            if(isNaN(monto)) return alert("Ingresá un monto");
 
             const mov = {
                 id: Date.now(),
+                fecha: document.getElementById('in-fecha').value,
                 tipo: mode,
-                concepto,
-                cat,
-                subcat,
+                cat: mode === 'Venta' ? 'Ingresos' : document.getElementById('in-cat').value,
+                subcat: subcat,
+                monto: monto,
+                estado: mode === 'Venta' ? 'Pagado' : document.getElementById('in-estado').value,
                 wallet: document.getElementById('in-wallet').value,
-                monto,
-                estado: document.getElementById('in-estado').value,
-                fecha: new Date().toISOString()
+                nota: document.getElementById('in-nota').value
             };
 
             db.movs.unshift(mov);
             save();
-            document.getElementById('in-concepto').value = '';
             document.getElementById('in-monto').value = '';
+            document.getElementById('in-nota').value = '';
             nav('home');
         }
 
-        function formatMoneda(val) {
-            return '$ ' + val.toLocaleString('es-AR', { minimumFractionDigits: 2 });
-        }
+        function formatM(n) { return '$ ' + n.toLocaleString('es-AR'); }
 
         function renderHome() {
-            const pagados = db.movs.filter(m => m.estado === 'Pagado');
-            const total = pagados.reduce((acc, m) => m.tipo === 'Venta' ? acc + m.monto : acc - m.monto, 0);
-            document.getElementById('total-balance').innerText = formatMoneda(total);
+            const total = db.movs.filter(m => m.estado === 'Pagado').reduce((acc, m) => m.tipo === 'Venta' ? acc + m.monto : acc - m.monto, 0);
+            document.getElementById('top-balance').innerText = formatM(total);
 
-            // Billeteras
             document.getElementById('wallet-container').innerHTML = db.wallets.map(w => {
-                const s = pagados.filter(m => m.wallet === w).reduce((acc, m) => m.tipo === 'Venta' ? acc + m.monto : acc - m.monto, 0);
-                return `<div class="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm">
-                    <p class="text-[9px] font-black text-slate-400 uppercase">${w}</p>
-                    <p class="text-sm font-bold mt-1 ${s >= 0 ? 'text-indigo-600' : 'text-red-500'}">${formatMoneda(s)}</p>
+                const s = db.movs.filter(m => m.wallet === w && m.estado === 'Pagado').reduce((acc, m) => m.tipo === 'Venta' ? acc + m.monto : acc - m.monto, 0);
+                return `<div class="card-dark p-4 flex justify-between items-center">
+                    <span class="text-xs font-bold text-slate-300">${w}</span>
+                    <span class="font-bold ${s >= 0 ? 'text-indigo-400' : 'text-red-400'}">${formatM(s)}</span>
                 </div>`;
             }).join('');
         }
 
         function renderHitos() {
             const search = document.getElementById('h-search').value.toLowerCase();
-            const cat = document.getElementById('h-filter-cat').value;
-            
-            const filtered = db.movs.filter(m => {
-                const matchesSearch = m.concepto.toLowerCase().includes(search) || m.subcat.toLowerCase().includes(search);
-                const matchesCat = cat === 'All' || m.cat === cat;
-                return matchesSearch && matchesCat;
-            });
-
+            const filtered = db.movs.filter(m => m.subcat.toLowerCase().includes(search) || m.nota.toLowerCase().includes(search));
             document.getElementById('hitos-list').innerHTML = filtered.map(m => `
-                <div class="bg-white p-4 rounded-2xl flex justify-between items-center shadow-sm border border-slate-100">
+                <div class="card-dark p-4 flex justify-between items-center border-l-4 ${m.tipo === 'Venta' ? 'border-green-500' : 'border-red-500'}">
                     <div>
-                        <h4 class="font-bold text-sm text-slate-800">${m.concepto}</h4>
-                        <p class="text-[9px] text-slate-400 font-bold uppercase">${m.cat} ${m.subcat !== '-' ? ' > ' + m.subcat : ''}</p>
+                        <p class="text-xs font-bold">${m.subcat}</p>
+                        <p class="text-[10px] text-slate-500">${m.fecha} • ${m.wallet} ${m.estado === 'Pendiente' ? '• (PEND)' : ''}</p>
                     </div>
-                    <div class="text-right">
-                        <p class="font-black ${m.tipo === 'Venta' ? 'text-green-600' : 'text-red-600'} text-sm">${m.tipo === 'Venta' ? '+' : '-'}${formatMoneda(m.monto)}</p>
-                        <button onclick="borrarMov(${m.id})" class="text-[8px] font-black text-slate-300">ELIMINAR</button>
-                    </div>
+                    <p class="font-bold ${m.tipo === 'Venta' ? 'text-green-400' : 'text-red-400'}">${m.tipo === 'Venta' ? '+' : '-'}${formatM(m.monto)}</p>
                 </div>
             `).join('');
         }
 
         function renderPendientes() {
-            // Lógica de suma y resta por concepto (persona)
-            const mapSaldos = {};
-            db.movs.forEach(m => {
-                if(!mapSaldos[m.concepto]) mapSaldos[m.concepto] = 0;
-                // Si es venta suma a mi favor, si es gasto resta de mi favor.
-                // Pero lo que importa es si está Pendiente vs Pagado.
-                if(m.estado === 'Pendiente') {
-                    mapSaldos[m.concepto] += (m.tipo === 'Venta' ? m.monto : -m.monto);
-                }
+            const saldos = {};
+            db.movs.filter(m => m.estado === 'Pendiente').forEach(m => {
+                if(!saldos[m.subcat]) saldos[m.subcat] = 0;
+                saldos[m.subcat] += (m.tipo === 'Venta' ? m.monto : -m.monto);
             });
 
-            let sumaTotal = 0;
-            const container = document.getElementById('pendientes-list');
-            container.innerHTML = Object.keys(mapSaldos).map(persona => {
-                const saldo = mapSaldos[persona];
-                if(saldo === 0) return '';
-                sumaTotal += Math.abs(saldo);
-                return `
-                <div class="bg-white p-4 rounded-2xl flex justify-between items-center border border-slate-200">
-                    <span class="font-bold text-slate-700">${persona}</span>
+            const list = document.getElementById('pendientes-list');
+            list.innerHTML = Object.keys(saldos).map(persona => {
+                const s = saldos[persona];
+                if(s === 0) return '';
+                return `<div class="card-dark p-4 flex justify-between items-center">
+                    <span class="font-bold text-sm">${persona}</span>
                     <div class="text-right">
-                        <p class="font-black ${saldo > 0 ? 'text-green-600' : 'text-red-600'}">
-                            ${saldo > 0 ? 'Me debe' : 'Debo'}: ${formatMoneda(Math.abs(saldo))}
-                        </p>
+                        <p class="text-[10px] uppercase font-bold text-slate-500">${s > 0 ? 'Me debe' : 'Le debo'}</p>
+                        <p class="font-black ${s > 0 ? 'text-green-400' : 'text-red-400'}">${formatM(Math.abs(s))}</p>
                     </div>
                 </div>`;
             }).join('');
-            document.getElementById('deuda-total-suma').innerText = formatMoneda(sumaTotal);
+            if(list.innerHTML === "") list.innerHTML = '<p class="text-center text-slate-500 text-sm mt-10">No hay deudas pendientes</p>';
         }
 
-        function addMaestro(key, inputId) {
-            const val = document.getElementById(inputId).value.trim();
-            if(val) {
-                db[key].push(val);
-                if(key === 'categories') db.subcategories[val] = [];
-                document.getElementById(inputId).value = '';
-                save();
-                alert("Guardado");
+        function addMaestro(key, id) {
+            const v = document.getElementById(id).value.trim();
+            if(v) {
+                db[key].push(v);
+                if(key === 'categories') db.subcategories[v] = [];
+                save(); alert("Añadido"); document.getElementById(id).value = '';
             }
         }
 
         function addSubMaestro() {
-            const cat = document.getElementById('m-cat-new').value; // Usa la seleccionada o escrita
+            const cat = document.getElementById('in-cat').value;
             const sub = document.getElementById('m-sub-new').value.trim();
-            if(!db.subcategories[cat]) db.subcategories[cat] = [];
-            db.subcategories[cat].push(sub);
-            document.getElementById('m-sub-new').value = '';
-            save();
-            alert("Sub-item vinculado");
+            if(sub) {
+                if(!db.subcategories[cat]) db.subcategories[cat] = [];
+                db.subcategories[cat].push(sub);
+                save(); alert("Vinculado a " + cat); document.getElementById('m-sub-new').value = '';
+            }
         }
 
-        function save() { localStorage.setItem('biz_v4', JSON.stringify(db)); }
-        function borrarMov(id) { if(confirm("¿Eliminar?")){ db.movs = db.movs.filter(m => m.id !== id); save(); renderHitos(); } }
+        function save() { localStorage.setItem('sm_gest_v1', JSON.stringify(db)); }
         function exportData() {
-            const blob = new Blob([JSON.stringify(db)], {type: 'application/json'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Backup_${new Date().toLocaleDateString()}.json`;
-            a.click();
+            const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
+            const a = document.createElement('a'); a.href = data; a.download = "backup_stella.json"; a.click();
         }
+        function deshacer() { if(confirm("¿Eliminar el último movimiento?")) { db.movs.shift(); save(); renderHome(); } }
 
         window.onload = () => nav('home');
     </script>
