@@ -3,35 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Stella Maris | Gestión v3</title>
+    <title>Stella Maris v4</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0a0c10; color: #e2e8f0; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0a0c10; color: #e2e8f0; overflow-x: hidden; }
         .app-card { background: #161b22; border: 1px solid #30363d; border-radius: 1rem; }
-        .input-field { background: #0d1117; border: 1px solid #30363d; border-radius: 0.7rem; padding: 0.8rem; width: 100%; color: white; outline: none; }
-        .input-field:focus { border-color: #58a6ff; }
-        .btn-submit { padding: 1rem; border-radius: 0.8rem; font-weight: 800; width: 100%; text-transform: uppercase; letter-spacing: 1px; }
-        .tab-nav { color: #8b949e; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; }
+        .input-field { background: #0d1117; border: 1px solid #30363d; border-radius: 0.7rem; padding: 0.8rem; width: 100%; color: white; outline: none; transition: all 0.2s; }
+        .input-field:focus { border-color: #58a6ff; box-shadow: 0 0 0 2px rgba(88,166,255,0.1); }
+        .btn-press { transition: transform 0.1s; cursor: pointer; }
+        .btn-press:active { transform: scale(0.95); opacity: 0.8; }
+        .tab-nav { color: #8b949e; font-size: 0.65rem; font-weight: 700; }
         .tab-active { color: #58a6ff; }
+        select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%238b949e'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.7rem center; background-size: 1rem; }
     </style>
 </head>
-<body class="pb-28">
+<body class="pb-32">
 
-    <header class="p-5 flex justify-between items-center sticky top-0 bg-[#0a0c10]/90 backdrop-blur-md z-50 border-b border-[#30363d]">
+    <header class="p-5 flex justify-between items-center sticky top-0 bg-[#0a0c10]/95 backdrop-blur-md z-50 border-b border-[#30363d]">
         <h1 class="text-lg font-extrabold tracking-tight">Stella Maris</h1>
         <div class="flex gap-2">
-            <button onclick="deshacer()" class="text-[10px] bg-[#21262d] px-3 py-1 rounded border border-[#30363d] font-bold">DESHACER</button>
-            <button onclick="exportData()" class="text-[10px] bg-[#21262d] px-3 py-1 rounded border border-[#30363d]"><i class="fas fa-download"></i></button>
+            <button onclick="deshacer()" class="btn-press text-[10px] bg-[#21262d] px-3 py-2 rounded-lg border border-[#30363d] font-bold uppercase">Deshacer</button>
+            <button onclick="exportData()" class="btn-press bg-[#21262d] p-2 rounded-lg border border-[#30363d]"><i class="fas fa-download text-xs"></i></button>
         </div>
     </header>
 
-    <main class="px-5 pt-6 space-y-6">
+    <main class="px-5 pt-4 space-y-6">
 
         <section id="view-home" class="view space-y-4">
-            <div class="app-card p-6 border-l-4 border-blue-500">
-                <p class="text-[10px] font-black text-slate-500 uppercase">Capital Total</p>
+            <div class="app-card p-6 border-l-4 border-blue-500 shadow-xl">
+                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Capital en Caja</p>
                 <h2 id="main-balance" class="text-3xl font-black text-white">$ 0</h2>
             </div>
             <div id="wallet-list" class="space-y-2"></div>
@@ -39,17 +41,19 @@
 
         <section id="view-ventas" class="view hidden space-y-4">
             <div class="app-card p-5 space-y-4">
-                <h3 class="text-xs font-black text-blue-400 uppercase">Registrar Ingreso</h3>
-                <input type="date" id="v-fecha" class="input-field">
-                <select id="v-wallet" class="input-field"></select>
-                <input type="text" id="v-monto" inputmode="decimal" placeholder="Monto $ 0.000" class="input-field text-xl font-bold text-blue-400" oninput="formatInput(this)">
-                <button onclick="saveVenta()" class="btn-submit bg-blue-600">Guardar Venta</button>
+                <h3 class="text-xs font-black text-blue-400 uppercase tracking-widest">Registrar Venta</h3>
+                <div class="grid gap-4">
+                    <input type="date" id="v-fecha" class="input-field">
+                    <select id="v-wallet" class="input-field"></select>
+                    <input type="text" id="v-monto" inputmode="decimal" placeholder="Monto $ 0.000" class="input-field text-xl font-bold text-blue-400" oninput="formatInput(this)">
+                    <button onclick="saveVenta()" class="btn-press py-4 bg-blue-600 rounded-xl font-extrabold uppercase shadow-lg shadow-blue-900/20">Guardar Venta</button>
+                </div>
             </div>
         </section>
 
         <section id="view-gastos" class="view hidden space-y-4">
             <div class="app-card p-5 space-y-4">
-                <h3 class="text-xs font-black text-red-400 uppercase">Registrar Egreso</h3>
+                <h3 class="text-xs font-black text-red-400 uppercase tracking-widest">Registrar Gasto</h3>
                 <input type="date" id="g-fecha" class="input-field">
                 <div class="grid grid-cols-2 gap-2">
                     <select id="g-cat" onchange="loadSubs()" class="input-field text-xs"></select>
@@ -61,7 +65,7 @@
                     <option value="Pagado">Ya lo pagué</option>
                     <option value="Pendiente" selected>Lo debo / Pendiente</option>
                 </select>
-                <button onclick="saveGasto()" class="btn-submit bg-red-600">Guardar Gasto</button>
+                <button onclick="saveGasto()" class="btn-press py-4 bg-red-600 rounded-xl font-extrabold uppercase shadow-lg shadow-red-900/20">Guardar Gasto</button>
             </div>
         </section>
 
@@ -82,38 +86,55 @@
         </section>
 
         <section id="view-maestros" class="view hidden space-y-6">
-            <div class="app-card p-5 space-y-4">
-                <h3 class="text-xs font-black text-slate-400 uppercase">Añadir Maestro</h3>
-                <select id="m-tipo" class="input-field">
-                    <option value="cat">Categoría Nueva</option>
-                    <option value="sub">Subcategoría (Elegir cat arriba)</option>
-                    <option value="wall">Método de Pago</option>
-                </select>
-                <input type="text" id="m-nombre" placeholder="Nombre..." class="input-field">
-                <button onclick="addMaestro()" class="btn-submit bg-slate-700">Añadir</button>
+            <div class="app-card p-5 space-y-6">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-slate-500 uppercase">Nueva Categoría (Ej: Impuestos)</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="m-cat-name" placeholder="Nombre..." class="input-field">
+                        <button onclick="addCat()" class="btn-press bg-blue-600 px-4 rounded-lg"><i class="fas fa-plus"></i></button>
+                    </div>
+                </div>
+                <hr class="border-[#30363d]">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-slate-500 uppercase">Vincular Subcat (Ej: Luz)</label>
+                    <select id="m-sub-parent" class="input-field text-xs"></select>
+                    <div class="flex gap-2">
+                        <input type="text" id="m-sub-name" placeholder="Nombre..." class="input-field">
+                        <button onclick="addSub()" class="btn-press bg-blue-600 px-4 rounded-lg"><i class="fas fa-plus"></i></button>
+                    </div>
+                </div>
+                <hr class="border-[#30363d]">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-slate-500 uppercase">Nuevo Método de Pago</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="m-wall-name" placeholder="Ej: Mercado Pago" class="input-field">
+                        <button onclick="addWall()" class="btn-press bg-blue-600 px-4 rounded-lg"><i class="fas fa-plus"></i></button>
+                    </div>
+                </div>
             </div>
-            <div class="app-card p-5">
-                <h3 class="text-xs font-black text-slate-400 uppercase mb-3">Lista de Maestros</h3>
-                <div id="maestros-display" class="text-[10px] space-y-1 opacity-60"></div>
+
+            <div class="app-card p-5 space-y-4">
+                <h3 class="text-xs font-black text-slate-400 uppercase">Listado de Maestros</h3>
+                <div id="maestros-listado" class="space-y-4"></div>
             </div>
         </section>
 
     </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-[#0d1117] border-t border-[#30363d] p-4 flex justify-around items-center z-50 shadow-2xl">
-        <button onclick="nav('home')" class="tab-nav flex flex-col items-center gap-1"><i class="fas fa-th-large text-lg"></i><span>Saldos</span></button>
-        <button onclick="nav('ventas')" class="tab-nav flex flex-col items-center gap-1"><i class="fas fa-plus text-lg text-blue-500"></i><span>Venta</span></button>
-        <button onclick="nav('gastos')" class="tab-nav flex flex-col items-center gap-1"><i class="fas fa-minus text-lg text-red-500"></i><span>Gasto</span></button>
-        <button onclick="nav('hitos')" class="tab-nav flex flex-col items-center gap-1"><i class="fas fa-receipt text-lg"></i><span>Hitos</span></button>
-        <button onclick="nav('pendientes')" class="tab-nav flex flex-col items-center gap-1"><i class="fas fa-clock text-lg"></i><span>Deudas</span></button>
-        <button onclick="nav('maestros')" class="tab-nav flex flex-col items-center gap-1"><i class="fas fa-tools text-lg"></i><span>Config</span></button>
+    <nav class="fixed bottom-0 left-0 right-0 bg-[#0d1117]/95 backdrop-blur-md border-t border-[#30363d] p-4 flex justify-around items-center z-50">
+        <button onclick="nav('home')" class="tab-nav btn-press flex flex-col items-center gap-1"><i class="fas fa-wallet text-lg"></i><span>Saldos</span></button>
+        <button onclick="nav('ventas')" class="tab-nav btn-press flex flex-col items-center gap-1"><i class="fas fa-plus-circle text-lg text-blue-500"></i><span>Venta</span></button>
+        <button onclick="nav('gastos')" class="tab-nav btn-press flex flex-col items-center gap-1"><i class="fas fa-minus-circle text-lg text-red-500"></i><span>Gasto</span></button>
+        <button onclick="nav('hitos')" class="tab-nav btn-press flex flex-col items-center gap-1"><i class="fas fa-list-ul text-lg"></i><span>Hitos</span></button>
+        <button onclick="nav('pendientes')" class="tab-nav btn-press flex flex-col items-center gap-1"><i class="fas fa-user-clock text-lg"></i><span>Deudas</span></button>
+        <button onclick="nav('maestros')" class="tab-nav btn-press flex flex-col items-center gap-1"><i class="fas fa-cog text-lg"></i><span>Config</span></button>
     </nav>
 
     <script>
-        let db = JSON.parse(localStorage.getItem('sm_v3')) || {
-            categories: ['Proveedores', 'Servicios'],
-            subcategories: { 'Proveedores': ['Juan'], 'Servicios': ['Luz'] },
-            wallets: ['Efectivo', 'Mercado Pago'],
+        let db = JSON.parse(localStorage.getItem('sm_v4')) || {
+            categories: ['Proveedores'],
+            subcategories: { 'Proveedores': ['Juan'] },
+            wallets: ['Efectivo'],
             movs: []
         };
 
@@ -121,20 +142,20 @@
             document.querySelectorAll('.view').forEach(e => e.classList.add('hidden'));
             document.querySelectorAll('.tab-nav').forEach(e => e.classList.remove('tab-active'));
             document.getElementById('view-' + v).classList.remove('hidden');
+            const btn = document.querySelector(`button[onclick="nav('${v}')"]`);
+            if(btn) btn.classList.add('tab-active');
             
             if(v === 'home') renderHome();
             if(v === 'hitos') renderHitos();
             if(v === 'pendientes') renderPendientes();
-            if(v === 'maestros') renderMaestrosList();
+            if(v === 'maestros') renderMaestros();
             setupSelectors();
         }
 
-        // Formato con punto mientras escribes
         function formatInput(el) {
-            let value = el.value.replace(/\D/g, "");
-            el.value = value ? new Intl.NumberFormat('es-AR').format(value) : "";
+            let val = el.value.replace(/\D/g, "");
+            el.value = val ? new Intl.NumberFormat('es-AR').format(val) : "";
         }
-
         function parseM(val) { return parseFloat(val.replace(/\./g, "")) || 0; }
         function formatM(n) { return '$ ' + n.toLocaleString('es-AR'); }
 
@@ -147,30 +168,84 @@
             document.getElementById('v-wallet').innerHTML = wHtml;
             document.getElementById('g-wallet').innerHTML = wHtml;
             document.getElementById('g-cat').innerHTML = db.categories.map(c => `<option value="${c}">${c}</option>`).join('');
+            document.getElementById('m-sub-parent').innerHTML = db.categories.map(c => `<option value="${c}">${c}</option>`).join('');
             loadSubs();
         }
 
         function loadSubs() {
             const cat = document.getElementById('g-cat').value;
-            const subs = db.subcategories[cat] || ['General'];
-            document.getElementById('g-sub').innerHTML = subs.map(s => `<option value="${s}">${s}</option>`).join('');
+            const subs = db.subcategories[cat] || [];
+            document.getElementById('g-sub').innerHTML = subs.map(s => `<option value="${s}">${s}</option>`).join('') || '<option value="Sin subcat">Sin subcat</option>';
         }
 
+        // --- GESTIÓN DE MAESTROS ---
+        function addCat() {
+            const name = document.getElementById('m-cat-name').value.trim();
+            if(name && !db.categories.includes(name)) {
+                db.categories.push(name); db.subcategories[name] = [];
+                save(); renderMaestros(); setupSelectors();
+                document.getElementById('m-cat-name').value = "";
+            }
+        }
+        function addSub() {
+            const parent = document.getElementById('m-sub-parent').value;
+            const name = document.getElementById('m-sub-name').value.trim();
+            if(parent && name && !db.subcategories[parent].includes(name)) {
+                db.subcategories[parent].push(name);
+                save(); renderMaestros();
+                document.getElementById('m-sub-name').value = "";
+            }
+        }
+        function addWall() {
+            const name = document.getElementById('m-wall-name').value.trim();
+            if(name && !db.wallets.includes(name)) {
+                db.wallets.push(name);
+                save(); renderMaestros(); setupSelectors();
+                document.getElementById('m-wall-name').value = "";
+            }
+        }
+        function deleteItem(type, name, parent = null) {
+            if(!confirm(`¿Borrar "${name}"?`)) return;
+            if(type === 'cat') { db.categories = db.categories.filter(c => c !== name); delete db.subcategories[name]; }
+            if(type === 'sub') { db.subcategories[parent] = db.subcategories[parent].filter(s => s !== name); }
+            if(type === 'wall') { db.wallets = db.wallets.filter(w => w !== name); }
+            save(); renderMaestros(); setupSelectors();
+        }
+
+        function renderMaestros() {
+            let html = `<div class="space-y-4">`;
+            // Métodos
+            html += `<div><p class="text-indigo-400 font-bold text-[10px] mb-2 uppercase">Bancos / Billeteras</p>`;
+            db.wallets.forEach(w => html += `<div class="flex justify-between items-center bg-[#0d1117] p-2 rounded mb-1 text-xs"><span>${w}</span><button onclick="deleteItem('wall','${w}')" class="text-red-500 p-1"><i class="fas fa-trash"></i></button></div>`);
+            html += `</div>`;
+            // Categorías y subs
+            html += `<div><p class="text-indigo-400 font-bold text-[10px] mb-2 uppercase">Categorías y Subcategorías</p>`;
+            db.categories.forEach(c => {
+                html += `<div class="bg-[#0d1117] p-3 rounded-lg mb-2 border border-[#30363d]">
+                    <div class="flex justify-between items-center mb-2 font-bold text-white text-xs"><span>${c}</span><button onclick="deleteItem('cat','${c}')" class="text-red-500"><i class="fas fa-trash text-[10px]"></i></button></div>
+                    <div class="pl-4 space-y-1">`;
+                (db.subcategories[c] || []).forEach(s => {
+                    html += `<div class="flex justify-between text-[10px] text-slate-400 italic"><span>${s}</span><button onclick="deleteItem('sub','${s}','${c}')" class="text-red-500/50"><i class="fas fa-times"></i></button></div>`;
+                });
+                html += `</div></div>`;
+            });
+            html += `</div></div>`;
+            document.getElementById('maestros-listado').innerHTML = html;
+        }
+
+        // --- OPERACIONES ---
         function saveVenta() {
             const monto = parseM(document.getElementById('v-monto').value);
             if(!monto) return;
             db.movs.unshift({ id: Date.now(), fecha: document.getElementById('v-fecha').value, tipo: 'Venta', subcat: 'Venta Directa', monto, wallet: document.getElementById('v-wallet').value, estado: 'Pagado' });
-            save(); clearFields(['v-monto']); nav('home');
+            save(); document.getElementById('v-monto').value = ""; nav('home');
         }
-
         function saveGasto() {
             const monto = parseM(document.getElementById('g-monto').value);
             if(!monto) return;
             db.movs.unshift({ id: Date.now(), fecha: document.getElementById('g-fecha').value, tipo: 'Gasto', cat: document.getElementById('g-cat').value, subcat: document.getElementById('g-sub').value, monto, wallet: document.getElementById('g-wallet').value, estado: document.getElementById('g-estado').value });
-            save(); clearFields(['g-monto']); nav('home');
+            save(); document.getElementById('g-monto').value = ""; nav('home');
         }
-
-        function clearFields(ids) { ids.forEach(id => document.getElementById(id).value = ""); }
 
         function renderHome() {
             const pagados = db.movs.filter(m => m.estado === 'Pagado');
@@ -178,7 +253,7 @@
             document.getElementById('main-balance').innerText = formatM(total);
             document.getElementById('wallet-list').innerHTML = db.wallets.map(w => {
                 const s = pagados.filter(m => m.wallet === w).reduce((acc, m) => m.tipo === 'Venta' ? acc + m.monto : acc - m.monto, 0);
-                return `<div class="app-card p-4 flex justify-between items-center"><span class="text-xs font-bold text-slate-400">${w}</span><span class="font-bold ${s >= 0 ? 'text-blue-400' : 'text-red-400'}">${formatM(s)}</span></div>`;
+                return `<div class="app-card p-4 flex justify-between items-center"><span class="text-xs font-bold text-slate-400 uppercase tracking-tighter">${w}</span><span class="font-bold ${s >= 0 ? 'text-blue-400' : 'text-red-400'}">${formatM(s)}</span></div>`;
             }).join('');
         }
 
@@ -188,46 +263,31 @@
             const list = db.movs.filter(m => (filter === 'All' || m.tipo === filter) && (m.subcat.toLowerCase().includes(search) || m.cat?.toLowerCase().includes(search)));
             document.getElementById('hitos-list').innerHTML = list.map(m => `
                 <div class="app-card p-4 flex justify-between items-center border-l-2 ${m.tipo === 'Venta' ? 'border-blue-500' : 'border-red-500'}">
-                    <div><p class="text-[11px] font-bold">${m.subcat}</p><p class="text-[8px] text-slate-500 font-bold uppercase">${m.fecha} • ${m.wallet}</p></div>
+                    <div><p class="text-[11px] font-bold text-white">${m.subcat}</p><p class="text-[8px] text-slate-500 font-bold">${m.fecha} • ${m.wallet} ${m.estado === 'Pendiente' ? ' (PENDIENTE)' : ''}</p></div>
                     <p class="font-bold text-xs ${m.tipo === 'Venta' ? 'text-blue-400' : 'text-red-400'}">${m.tipo === 'Venta' ? '+' : '-'}${formatM(m.monto)}</p>
                 </div>`).join('');
         }
 
         function renderPendientes() {
             const saldos = {};
-            db.movs.forEach(m => {
-                if(m.estado === 'Pendiente') {
-                    if(!saldos[m.subcat]) saldos[m.subcat] = 0;
-                    // IMPORTANTE: Si es gasto pendiente (debo), resta. Si es venta pendiente (me deben), suma.
-                    saldos[m.subcat] += (m.tipo === 'Venta' ? m.monto : -m.monto);
-                }
+            // Recalculo total del historial
+            db.movs.filter(m => m.estado === 'Pendiente').forEach(m => {
+                if(!saldos[m.subcat]) saldos[m.subcat] = 0;
+                saldos[m.subcat] += (m.tipo === 'Venta' ? m.monto : -m.monto);
             });
-            document.getElementById('pendientes-list').innerHTML = Object.keys(saldos).map(p => {
+            const list = Object.keys(saldos).map(p => {
                 const s = saldos[p]; if(s === 0) return '';
-                return `<div class="app-card p-4 flex justify-between items-center"><span class="font-bold text-xs">${p}</span><p class="font-black text-xs ${s > 0 ? 'text-blue-400' : 'text-red-400'}">${s > 0 ? 'ME DEBE' : 'DEBO'} ${formatM(Math.abs(s))}</p></div>`;
+                return `<div class="app-card p-4 flex justify-between items-center"><span class="font-bold text-xs uppercase">${p}</span><p class="font-black text-xs ${s > 0 ? 'text-blue-400' : 'text-red-400'} tracking-tighter">${s > 0 ? 'ME DEBE' : 'DEBO'} ${formatM(Math.abs(s))}</p></div>`;
             }).join('');
+            document.getElementById('pendientes-list').innerHTML = list || '<p class="text-center text-slate-500 text-xs mt-10">Sin deudas registradas</p>';
         }
 
-        function addMaestro() {
-            const tipo = document.getElementById('m-tipo').value;
-            const nombre = document.getElementById('m-nombre').value.trim();
-            if(!nombre) return;
-            if(tipo === 'cat') { db.categories.push(nombre); db.subcategories[nombre] = []; }
-            if(tipo === 'sub') { const cat = document.getElementById('g-cat').value; db.subcategories[cat].push(nombre); }
-            if(tipo === 'wall') db.wallets.push(nombre);
-            save(); document.getElementById('m-nombre').value = ""; renderMaestrosList(); setupSelectors();
-        }
-
-        function renderMaestrosList() {
-            document.getElementById('maestros-display').innerHTML = `Bancos: ${db.wallets.join(', ')} <br> Categorías: ${db.categories.join(', ')}`;
-        }
-
-        function save() { localStorage.setItem('sm_v3', JSON.stringify(db)); }
+        function save() { localStorage.setItem('sm_v4', JSON.stringify(db)); }
         function exportData() {
             const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
-            a.download = "stella_maris_v3.json"; a.click();
+            a.download = "backup_stella.json"; a.click();
         }
-        function deshacer() { if(confirm("¿Borrar último?")) { db.movs.shift(); save(); nav('home'); } }
+        function deshacer() { if(confirm("¿Borrar último registro?")) { db.movs.shift(); save(); nav('home'); } }
 
         window.onload = () => nav('home');
     </script>
