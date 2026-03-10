@@ -3,207 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Stella Maris v7.4 Supreme</title>
+    <title>Stella Maris v7.5 Elite</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
         
         body { 
-            background: #020408; font-family: 'Plus Jakarta Sans', sans-serif; color: #f1f5f9;
+            background: #02040a; font-family: 'Plus Jakarta Sans', sans-serif; color: #f1f5f9;
             overflow-x: hidden; width: 100vw; position: fixed; height: 100%;
         }
 
         #main-scroll {
             height: calc(100% - 90px);
-            overflow-y: auto; padding-bottom: 50px;
+            overflow-y: auto; padding-bottom: 60px;
             -webkit-overflow-scrolling: touch;
         }
 
-        /* DISEÑO LUXURY */
         .app-card { 
-            background: linear-gradient(145deg, #0f172a, #020617); 
-            border: 1px solid #1e293b; 
-            border-radius: 1.5rem;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(160deg, #0f172a 0%, #020617 100%); 
+            border: 1px solid #1e293b; border-radius: 1.2rem;
         }
 
-        .input-luxury {
-            background: #020617; border: 1px solid #334155; border-radius: 1rem;
-            padding: 1rem; width: 100%; color: white; outline: none; transition: 0.2s;
-            font-size: 14px;
-        }
-        .input-luxury:focus { border-color: #38bdf8; box-shadow: 0 0 0 2px rgba(56,189,248,0.1); }
+        /* TÍTULOS DE CAMPOS */
+        .field-label { font-[10px] font-bold text-sky-400 uppercase tracking-tighter mb-1 ml-1 block; }
 
-        /* BOTONES QUE SE HUNDEN */
-        .btn-luxury {
-            background: #0ea5e9; color: white; padding: 1.2rem; border-radius: 1rem;
+        .input-elite {
+            background: #000000; border: 1px solid #334155; border-radius: 0.8rem;
+            padding: 0.9rem; width: 100%; color: white; outline: none; transition: 0.2s;
+            font-size: 15px;
+        }
+        .input-elite:focus { border-color: #38bdf8; background: #020617; }
+
+        /* BOTÓN CON EFECTO DE HUNDIMIENTO REAL */
+        .btn-elite {
+            background: #0284c7; color: white; padding: 1.1rem; border-radius: 1rem;
             font-weight: 800; width: 100%; text-transform: uppercase; letter-spacing: 1px;
-            transition: all 0.1s active; border: none;
+            transition: all 0.05s ease-in-out; border: none; cursor: pointer;
+            box-shadow: 0 4px 0 #075985; margin-bottom: 4px;
         }
-        .btn-luxury:active { transform: scale(0.96); opacity: 0.8; }
-        .btn-red { background: #e11d48; }
-
-        /* NAVEGACIÓN PREMIUM */
-        .nav-tab {
-            flex: 1; display: flex; flex-direction: column; align-items: center;
-            justify-content: center; color: #64748b; font-size: 18px; transition: 0.3s;
+        .btn-elite:active { 
+            transform: translateY(3px) scale(0.97); 
+            box-shadow: 0 1px 0 #075985;
+            filter: brightness(1.2);
         }
-        .nav-active { color: #38bdf8; position: relative; }
-        .nav-active::after {
-            content: ''; position: absolute; top: 0; width: 25px; height: 3px;
-            background: #38bdf8; border-radius: 0 0 5px 5px;
-        }
-
-        .cash-real-field {
-            background: rgba(15, 23, 42, 0.8); border: 1px solid #334155;
-            border-radius: 0.7rem; width: 110px; text-align: center; color: #38bdf8; font-weight: 700;
-        }
+        .btn-red { background: #be123c; box-shadow: 0 4px 0 #881337; }
+        .btn-red:active { box-shadow: 0 1px 0 #881337; }
 
         /* FILTROS */
-        .filter-pill {
-            padding: 6px 12px; border-radius: 20px; font-size: 10px; font-weight: 700;
-            background: #1e293b; border: 1px solid #334155; color: #94a3b8;
+        .filter-chip {
+            padding: 8px 16px; border-radius: 12px; font-size: 11px; font-weight: 800;
+            background: #1e293b; border: 1px solid #334155; color: #64748b; white-space: nowrap;
         }
         .filter-active { background: #38bdf8; border-color: #38bdf8; color: #020617; }
+
+        /* NAVEGACIÓN */
+        .nav-link { flex: 1; display: flex; flex-direction: column; align-items: center; color: #475569; }
+        .nav-active { color: #38bdf8; }
+        .nav-active i { transform: translateY(-3px); }
     </style>
 </head>
 <body>
 
-    <header class="p-6 flex justify-between items-center bg-[#020408] border-b border-[#1e293b]">
+    <header class="p-5 flex justify-between items-center bg-[#02040a] border-b border-[#1e293b]">
         <div>
-            <h1 class="text-[11px] font-black uppercase tracking-[0.3em] text-sky-400">Stella Maris</h1>
-            <p class="text-[8px] text-slate-500 font-bold uppercase">Supreme Edition v7.4</p>
+            <h1 class="text-xs font-black uppercase tracking-widest text-sky-500">Stella Maris</h1>
+            <p class="text-[8px] text-slate-500 font-bold">V7.5 ELITE PERFORMANCE</p>
         </div>
-        <button onclick="deshacer()" class="text-[9px] bg-red-500/10 text-red-500 px-4 py-2 rounded-full border border-red-500/20 font-black">DESHACER</button>
+        <button onclick="deshacer()" class="text-[9px] text-rose-500 font-black px-3 py-2 border border-rose-500/20 rounded-lg active:scale-90">DESHACER</button>
     </header>
 
-    <div id="main-scroll" class="px-5 pt-4 space-y-6">
+    <div id="main-scroll" class="px-5 pt-5 space-y-6">
 
-        <section id="view-dash" class="view space-y-6">
-            <div class="app-card p-8 text-center relative overflow-hidden">
-                <div class="absolute -right-10 -top-10 w-32 h-32 bg-sky-500/10 rounded-full blur-3xl"></div>
-                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Capital Total Disponible</p>
-                <h2 id="grand-total" class="text-4xl font-black text-white">$ 0</h2>
-                <div id="today-stats" class="flex justify-center gap-4 mt-4 text-[10px] font-bold">
-                    <span class="text-emerald-400">HOY: + <span id="today-in">0</span></span>
-                    <span class="text-rose-400">HOY: - <span id="today-out">0</span></span>
-                </div>
+        <section id="view-dash" class="view space-y-5">
+            <div class="app-card p-6 text-center shadow-2xl">
+                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Saldo Total</span>
+                <h2 id="grand-total" class="text-4xl font-black text-white mt-1">$ 0</h2>
             </div>
-            
-            <div id="wallet-grid" class="space-y-4"></div>
+            <div id="wallet-grid" class="space-y-3"></div>
         </section>
 
         <section id="view-venta" class="view hidden space-y-4">
             <div class="app-card p-6 space-y-4">
-                <h2 class="text-sky-400 font-black text-center text-xs uppercase italic">Nuevo Ingreso</h2>
-                <div class="space-y-1">
-                    <label class="text-[10px] font-bold text-slate-500 ml-2">FECHA DE VENTA</label>
-                    <input type="date" id="v-fecha" class="input-luxury">
+                <h3 class="text-center font-black text-sky-400 text-xs italic">NUEVA VENTA</h3>
+                <div>
+                    <span class="field-label">FECHA DE COBRO</span>
+                    <input type="date" id="v-fecha" class="input-elite">
                 </div>
-                <div class="space-y-1">
-                    <label class="text-[10px] font-bold text-slate-500 ml-2">MÉTODO DE COBRO</label>
-                    <select id="v-wallet" class="input-luxury"></select>
+                <div>
+                    <span class="field-label">DÓNDE ENTRA EL DINERO</span>
+                    <select id="v-wallet" class="input-elite"></select>
                 </div>
-                <div class="space-y-1">
-                    <label class="text-[10px] font-bold text-slate-500 ml-2">MONTO TOTAL</label>
-                    <input type="text" id="v-monto" inputmode="decimal" placeholder="$ 0" class="input-luxury text-3xl font-black text-center" oninput="formatInput(this)">
+                <div>
+                    <span class="field-label">MONTO TOTAL $</span>
+                    <input type="text" id="v-monto" inputmode="decimal" placeholder="0.000" class="input-elite text-2xl font-black text-center" oninput="formatInput(this)">
                 </div>
-                <div class="space-y-1">
-                    <label class="text-[10px] font-bold text-slate-500 ml-2">DESCRIPCIÓN / CLIENTE</label>
-                    <input type="text" id="v-nota" placeholder="Escriba aquí..." class="input-luxury">
+                <div>
+                    <span class="field-label">CLIENTE O NOTA</span>
+                    <input type="text" id="v-nota" placeholder="..." class="input-elite">
                 </div>
-                <button onclick="saveMov('Venta')" class="btn-luxury">Confirmar Ingreso</button>
+                <button onclick="saveMov('Venta')" class="btn-elite">Guardar Ingreso</button>
             </div>
         </section>
 
         <section id="view-gasto" class="view hidden space-y-4">
             <div class="app-card p-6 space-y-4">
-                <h2 class="text-rose-500 font-black text-center text-xs uppercase italic">Nuevo Egreso</h2>
+                <h3 class="text-center font-black text-rose-500 text-xs italic">REGISTRAR EGRESO</h3>
                 <div class="grid grid-cols-2 gap-3">
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-bold text-slate-500 ml-2">CATEGORÍA</label>
-                        <select id="g-cat" onchange="loadSubs()" class="input-luxury text-xs"></select>
+                    <div>
+                        <span class="field-label">CATEGORÍA</span>
+                        <select id="g-cat" onchange="loadSubs()" class="input-elite text-xs"></select>
                     </div>
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-bold text-slate-500 ml-2">SUBCATEGORÍA</label>
-                        <select id="g-sub" class="input-luxury text-xs"></select>
+                    <div>
+                        <span class="field-label">SUBCATEGORÍA</span>
+                        <select id="g-sub" class="input-elite text-xs"></select>
                     </div>
                 </div>
-                <div class="space-y-1">
-                    <label class="text-[10px] font-bold text-slate-500 ml-2">MONTO PAGADO O DEUDA</label>
-                    <input type="text" id="g-monto" inputmode="decimal" placeholder="$ 0" class="input-luxury text-3xl font-black text-center" oninput="formatInput(this)">
+                <div>
+                    <span class="field-label">MONTO $</span>
+                    <input type="text" id="g-monto" inputmode="decimal" placeholder="0.000" class="input-elite text-2xl font-black text-center" oninput="formatInput(this)">
                 </div>
-                <div class="space-y-1">
-                    <label class="text-[10px] font-bold text-slate-500 ml-2">ORIGEN DEL DINERO</label>
-                    <select id="g-wallet" class="input-luxury"></select>
+                <div>
+                    <span class="field-label">MÉTODO DE PAGO</span>
+                    <select id="g-wallet" class="input-elite"></select>
                 </div>
-                <div class="space-y-1">
-                    <label class="text-[10px] font-bold text-slate-500 ml-2">ESTADO DEL PAGO</label>
-                    <select id="g-estado" class="input-luxury font-bold text-rose-400">
-                        <option value="Pagado">PAGADO (Salió el dinero)</option>
-                        <option value="Pendiente">PENDIENTE (Es una deuda)</option>
+                <div>
+                    <span class="field-label">ESTADO DE CUENTA</span>
+                    <select id="g-estado" class="input-elite font-bold">
+                        <option value="Pagado">YA LO PAGUÉ</option>
+                        <option value="Pendiente">LO DEBO (PENDIENTE)</option>
                     </select>
                 </div>
-                <div class="space-y-1">
-                    <label class="text-[10px] font-bold text-slate-500 ml-2">NOTA / PROVEEDOR</label>
-                    <input type="text" id="g-nota" placeholder="Escriba aquí..." class="input-luxury">
+                <div>
+                    <span class="field-label">PROVEEDOR / NOTA</span>
+                    <input type="text" id="g-nota" placeholder="..." class="input-elite">
                 </div>
-                <button onclick="saveMov('Gasto')" class="btn-luxury btn-red">Confirmar Egreso</button>
+                <button onclick="saveMov('Gasto')" class="btn-elite btn-red">Guardar Gasto</button>
             </div>
         </section>
 
         <section id="view-hitos" class="view hidden space-y-4">
-            <div class="flex overflow-x-auto gap-2 no-scrollbar pb-2">
-                <button onclick="filterH('Todo')" id="f-Todo" class="filter-pill filter-active">TODO</button>
-                <button onclick="filterH('Venta')" id="f-Venta" class="filter-pill">VENTAS</button>
-                <button onclick="filterH('Pagado')" id="f-Pagado" class="filter-pill">PAGADOS</button>
-                <button onclick="filterH('Pendiente')" id="f-Pendiente" class="filter-pill">DEUDAS</button>
+            <div class="flex overflow-x-auto gap-2 pb-2 no-scrollbar">
+                <button onclick="filterH('Todo')" id="f-Todo" class="filter-chip filter-active">TODO</button>
+                <button onclick="filterH('Venta')" id="f-Venta" class="filter-chip">VENTAS</button>
+                <button onclick="filterH('Pagado')" id="f-Pagado" class="filter-chip">PAGADOS</button>
+                <button onclick="filterH('Pendiente')" id="f-Pendiente" class="filter-chip">DEUDAS</button>
             </div>
-            <div class="flex gap-2">
-                <input type="text" id="h-search" onkeyup="renderHitos()" placeholder="Buscar por nota o categoría..." class="input-luxury text-xs">
-            </div>
-            <div id="hitos-list" class="space-y-3"></div>
+            <input type="text" id="h-search" onkeyup="renderHitos()" placeholder="Filtrar por nombre o nota..." class="input-elite text-xs">
+            <div id="hitos-list" class="space-y-2"></div>
         </section>
 
         <section id="view-deudas" class="view hidden space-y-4">
             <div id="deudas-list" class="space-y-3"></div>
         </section>
 
-        <section id="view-config" class="view hidden space-y-6 pb-20">
-            <div class="app-card p-6 space-y-4">
-                <h3 class="text-[10px] font-bold text-sky-400 uppercase">Panel de Control</h3>
-                <input type="text" id="cfg-cat" placeholder="NOMBRE DE CATEGORÍA" class="input-luxury">
-                <button onclick="addCfg('cat')" class="btn-luxury bg-slate-800 py-3 rounded-lg">+</button>
+        <section id="view-config" class="view hidden space-y-4 pb-20">
+            <div class="app-card p-5 space-y-4">
+                <span class="field-label">GESTIÓN DE MAESTROS</span>
+                <input type="text" id="cfg-wall" placeholder="Nuevo Banco o Billetera" class="input-elite">
+                <button onclick="addCfg('wall')" class="btn-elite bg-slate-700 shadow-slate-900">+</button>
                 <div class="flex gap-2">
-                    <select id="cfg-cat-sel" class="input-luxury w-1/2 text-xs"></select>
-                    <input type="text" id="cfg-sub" placeholder="SUBCATEGORÍA" class="input-luxury w-1/2">
+                    <input type="text" id="cfg-cat" placeholder="Nueva Categoría" class="input-elite w-1/2 text-xs">
+                    <button onclick="addCfg('cat')" class="btn-elite bg-slate-700 shadow-slate-900 w-1/2">+</button>
                 </div>
-                <button onclick="addCfg('sub')" class="btn-luxury bg-slate-800 py-3 rounded-lg">+</button>
-                <input type="text" id="cfg-wall" placeholder="NOMBRE DEL BANCO" class="input-luxury">
-                <button onclick="addCfg('wall')" class="btn-luxury bg-slate-800 py-3 rounded-lg">+</button>
             </div>
-            <div id="cfg-list" class="space-y-3"></div>
+            <div id="cfg-list" class="space-y-2"></div>
         </section>
     </div>
 
-    <nav class="fixed bottom-0 w-full h-[80px] bg-[#020617] border-t border-[#1e293b] flex justify-around items-center px-2">
-        <button onclick="nav('dash')" id="n-dash" class="nav-tab"><i class="fas fa-home"></i><span class="text-[7px] font-black mt-1 uppercase">Inicio</span></button>
-        <button onclick="nav('venta')" id="n-venta" class="nav-tab"><i class="fas fa-plus-circle"></i><span class="text-[7px] font-black mt-1 uppercase">Venta</span></button>
-        <button onclick="nav('gasto')" id="n-gasto" class="nav-tab"><i class="fas fa-minus-circle"></i><span class="text-[7px] font-black mt-1 uppercase">Gasto</span></button>
-        <button onclick="nav('hitos')" id="n-hitos" class="nav-tab"><i class="fas fa-stream"></i><span class="text-[7px] font-black mt-1 uppercase">Movs</span></button>
-        <button onclick="nav('deudas')" id="n-deudas" class="nav-tab"><i class="fas fa-file-invoice"></i><span class="text-[7px] font-black mt-1 uppercase">Deudas</span></button>
-        <button onclick="nav('config')" id="n-config" class="nav-tab"><i class="fas fa-cog"></i><span class="text-[7px] font-black mt-1 uppercase">Config</span></button>
+    <nav class="fixed bottom-0 w-full h-[85px] bg-black border-t border-[#1e293b] flex justify-around items-center px-2">
+        <button onclick="nav('dash')" id="n-dash" class="nav-link"><i class="fas fa-wallet mb-1"></i><span class="text-[7px] font-black uppercase">Saldos</span></button>
+        <button onclick="nav('venta')" id="n-venta" class="nav-link"><i class="fas fa-plus-circle mb-1"></i><span class="text-[7px] font-black uppercase">Venta</span></button>
+        <button onclick="nav('gasto')" id="n-gasto" class="nav-link"><i class="fas fa-minus-circle mb-1"></i><span class="text-[7px] font-black uppercase">Gasto</span></button>
+        <button onclick="nav('hitos')" id="n-hitos" class="nav-link"><i class="fas fa-receipt mb-1"></i><span class="text-[7px] font-black uppercase">Hitos</span></button>
+        <button onclick="nav('deudas')" id="n-deudas" class="nav-link"><i class="fas fa-clock mb-1"></i><span class="text-[7px] font-black uppercase">Deudas</span></button>
+        <button onclick="nav('config')" id="n-config" class="nav-link"><i class="fas fa-tools mb-1"></i><span class="text-[7px] font-black uppercase">Config</span></button>
     </nav>
 
     <script>
-        let db = JSON.parse(localStorage.getItem('sm_v74')) || { cats:['Gastos'], subs:{'Gastos':['General']}, walls:['Efectivo'], movs:[], real:{} };
-        let activeFilter = 'Todo';
+        let db = JSON.parse(localStorage.getItem('sm_v75')) || { cats:['Prov'], subs:{'Prov':['General']}, walls:['Efectivo'], movs:[], real:{} };
+        let currentFiltro = 'Todo';
 
         function nav(v) {
             document.querySelectorAll('.view').forEach(e => e.classList.add('hidden'));
-            document.querySelectorAll('.nav-tab').forEach(e => e.classList.remove('nav-active'));
+            document.querySelectorAll('.nav-link').forEach(e => e.classList.remove('nav-active'));
             document.getElementById('view-'+v).classList.remove('hidden');
             document.getElementById('n-'+v).classList.add('nav-active');
             if(v==='dash') renderDash();
@@ -221,82 +204,73 @@
         function formatM(n) { return '$ ' + Math.abs(n).toLocaleString('es-AR'); }
 
         function saveMov(tipo) {
-            const prefix = tipo === 'Venta' ? 'v' : 'g';
-            const m = parseM(document.getElementById(prefix+'-monto').value);
+            const pre = tipo === 'Venta' ? 'v' : 'g';
+            const m = parseM(document.getElementById(pre+'-monto').value);
             if(!m) return;
 
-            const nuevo = {
+            const entry = {
                 id: Date.now(),
-                fecha: document.getElementById(prefix+'-fecha').value || new Date().toISOString().split('T')[0],
+                fecha: document.getElementById(pre+'-fecha').value || new Date().toISOString().split('T')[0],
                 tipo: tipo,
-                cat: tipo === 'Venta' ? 'Ventas' : document.getElementById('g-cat').value,
+                cat: tipo === 'Venta' ? 'Venta' : document.getElementById('g-cat').value,
                 subcat: tipo === 'Venta' ? 'Venta Directa' : document.getElementById('g-sub').value,
                 monto: m,
-                wallet: document.getElementById(prefix+'-wallet').value,
+                wallet: document.getElementById(pre+'-wallet').value,
                 estado: tipo === 'Venta' ? 'Pagado' : document.getElementById('g-estado').value,
-                nota: document.getElementById(prefix+'-nota').value
+                nota: document.getElementById(pre+'-nota').value
             };
 
-            db.movs.unshift(nuevo);
-            save(); 
+            db.movs.unshift(entry);
+            save();
             
-            // LIMPIEZA DE CAMPOS
-            document.getElementById(prefix+'-monto').value = "";
-            document.getElementById(prefix+'-nota').value = "";
-            alert("✓ Registro Exitoso");
+            // LIMPIEZA ABSOLUTA DE CAMPOS
+            document.getElementById(pre+'-monto').value = "";
+            document.getElementById(pre+'-nota').value = "";
+            
+            // Feedback visual rápido
+            renderDash();
+            alert("✓ Registrado y Campos Limpios");
         }
 
         function renderDash() {
-            let total = 0, inT = 0, outT = 0;
-            const hoy = new Date().toISOString().split('T')[0];
-
-            db.movs.forEach(m => {
-                if(m.fecha === hoy && m.estado === 'Pagado') {
-                    if(m.tipo === 'Venta') inT += m.monto; else outT += m.monto;
-                }
-            });
-
+            let total = 0;
             const html = db.walls.map(w => {
                 const s = db.movs.filter(m => m.wallet === w && m.estado === 'Pagado').reduce((a,m) => m.tipo==='Venta'? a+m.monto : a-m.monto, 0);
                 total += s;
                 const r = db.real[w] || 0;
-                const d = r - s;
                 return `
-                <div class="app-card p-5 flex justify-between items-center border-l-4 ${s >= 0 ? 'border-sky-500' : 'border-rose-500'}">
-                    <div><p class="text-[9px] uppercase font-black text-slate-500">${w}</p><p class="text-xl font-black">${formatM(s)}</p></div>
-                    <div class="flex flex-col items-end">
-                        <input type="text" class="cash-real-field text-[11px] p-1" onchange="updReal('${w}', this.value)" value="${r?new Intl.NumberFormat('es-AR').format(r):''}" placeholder="PLATA REAL">
-                        <p class="text-[8px] font-black mt-2 ${d===0?'text-emerald-400':'text-amber-500'}">${d===0?'SIN DIFERENCIA':'DIF: '+formatM(d)}</p>
+                <div class="app-card p-4 flex justify-between items-center border-l-4 ${s>=0?'border-sky-500':'border-rose-500'}">
+                    <div><p class="text-[9px] font-black text-slate-500 uppercase">${w}</p><p class="text-xl font-black text-white">${formatM(s)}</p></div>
+                    <div class="text-right">
+                        <input type="text" class="bg-black/50 border border-slate-700 rounded p-1 w-24 text-center text-xs text-sky-400 font-bold" onchange="updReal('${w}', this.value)" value="${r?new Intl.NumberFormat('es-AR').format(r):''}" placeholder="REAL $">
+                        <p class="text-[8px] font-bold mt-1 text-slate-500">DIF: ${formatM(r-s)}</p>
                     </div>
                 </div>`;
             }).join('');
-
             document.getElementById('wallet-grid').innerHTML = html;
             document.getElementById('grand-total').innerText = formatM(total);
-            document.getElementById('today-in').innerText = formatM(inT);
-            document.getElementById('today-out').innerText = formatM(outT);
         }
 
         function updReal(w, v) { db.real[w] = parseM(v); save(); renderDash(); }
 
         function filterH(f) {
-            activeFilter = f;
-            document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('filter-active'));
+            currentFiltro = f;
+            document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('filter-active'));
             document.getElementById('f-'+f).classList.add('filter-active');
             renderHitos();
         }
 
         function renderHitos() {
             const s = document.getElementById('h-search').value.toLowerCase();
-            const filtered = db.movs.filter(m => {
-                const match = (m.subcat + m.nota + m.cat).toLowerCase().includes(s);
-                const filterMatch = (activeFilter === 'Todo' || m.tipo === activeFilter || m.estado === activeFilter);
-                return match && filterMatch;
+            const fil = db.movs.filter(m => {
+                const search = (m.cat + m.subcat + m.nota).toLowerCase().includes(s);
+                const filter = (currentFiltro==='Todo' || m.tipo === currentFiltro || m.estado === currentFiltro);
+                return search && filter;
             });
-            document.getElementById('hitos-list').innerHTML = filtered.map(m => `
-                <div class="app-card p-4 flex justify-between border-l-2 ${m.tipo==='Venta'?'border-emerald-500':'border-rose-500'}">
-                    <div class="text-[11px]"><b>${m.subcat}</b><br><span class="text-slate-500 text-[9px] uppercase font-bold">${m.fecha} | ${m.wallet}</span><br><span class="text-sky-400 text-[9px]">${m.nota}</span></div>
-                    <div class="text-right"><p class="font-black ${m.tipo==='Venta'?'text-emerald-400':'text-rose-400'}">${m.tipo==='Venta'?'+':'-'}${formatM(m.monto)}</p><p class="text-[8px] font-bold text-slate-600 uppercase">${m.estado}</p></div>
+            document.getElementById('hitos-list').innerHTML = fil.map(m => `
+                <div class="app-card p-4 flex justify-between border-l-2 ${m.tipo==='Venta'?'border-sky-500':'border-rose-500'}">
+                    <div class="text-[11px]"><b class="text-white uppercase">${m.subcat}</b><br><span class="text-slate-500 text-[9px]">${m.fecha} | ${m.wallet}</span><br><i class="text-slate-400 font-medium">${m.nota}</i></div>
+                    <div class="text-right"><p class="font-black ${m.tipo==='Venta'?'text-sky-400':'text-rose-400'}">${m.tipo==='Venta'?'+':'-'}${formatM(m.monto)}</p><p class="text-[8px] uppercase font-black text-slate-600">${m.estado}</p></div>
                 </div>`).join('');
         }
 
@@ -310,35 +284,31 @@
             });
             document.getElementById('deudas-list').innerHTML = Object.keys(res).map(p => {
                 if(res[p] <= 0) return '';
-                return `<div class="app-card p-5 flex justify-between items-center"><span class="font-black text-xs uppercase">${p}</span><span class="text-rose-500 font-black">PENDIENTE: ${formatM(res[p])}</span></div>`;
-            }).join('') || '<p class="text-center text-[10px] text-slate-500 mt-20">NO TIENES DEUDAS PENDIENTES</p>';
+                return `<div class="app-card p-5 flex justify-between items-center"><span class="font-black text-xs text-white uppercase">${p}</span><span class="text-rose-500 font-black">DEBO ${formatM(res[p])}</span></div>`;
+            }).join('') || '<p class="text-center text-slate-600 text-xs mt-10">SIN DEUDAS</p>';
         }
 
         function addCfg(t) {
-            if(t==='cat') { const v=document.getElementById('cfg-cat').value; if(v){db.cats.push(v); db.subs[v]=[];}}
-            if(t==='sub') { const c=document.getElementById('cfg-cat-sel').value; const v=document.getElementById('cfg-sub').value; if(v){db.subs[c].push(v);}}
-            if(t==='wall') { const v=document.getElementById('cfg-wall').value; if(v)db.walls.push(v);}
+            const v = document.getElementById('cfg-'+t).value;
+            if(!v) return;
+            if(t==='wall') db.walls.push(v);
+            if(t==='cat') { db.cats.push(v); db.subs[v] = ['Varios']; }
             save(); renderCfg();
+            document.getElementById('cfg-'+t).value = "";
         }
 
-        function delCfg(t, n, p) {
-            if(!confirm("¿Eliminar este registro?")) return;
-            if(t==='cat') { db.cats = db.cats.filter(x=>x!==n); delete db.subs[n]; }
-            if(t==='sub') db.subs[p] = db.subs[p].filter(x=>x!==n);
+        function delCfg(t, n) {
+            if(!confirm("¿Borrar?")) return;
             if(t==='wall') db.walls = db.walls.filter(x=>x!==n);
+            if(t==='cat') db.cats = db.cats.filter(x=>x!==n);
             save(); renderCfg();
         }
 
         function renderCfg() {
-            let h = '';
-            db.cats.forEach(c => {
-                h += `<div class="app-card p-4 mb-3"><div class="flex justify-between font-black text-sky-400 uppercase text-[10px]"><span>${c}</span><i onclick="delCfg('cat','${c}')" class="fas fa-trash text-rose-900"></i></div>`;
-                (db.subs[c]||[]).forEach(s => {
-                    h += `<div class="flex justify-between text-[10px] pl-4 mt-2 text-slate-400 font-bold uppercase"><span>${s}</span><i onclick="delCfg('sub','${s}','${c}')" class="fas fa-times"></i></div>`;
-                });
-                h += `</div>`;
-            });
-            h += `<div class="app-card p-4 text-[10px] font-bold text-slate-500">Bancos: ${db.walls.map(w => `<span class="bg-slate-800 px-3 py-1 rounded ml-1 text-white">${w} <i onclick="delCfg('wall','${w}')" class="fas fa-times text-[8px] ml-1"></i></span>`).join('')}</div>`;
+            let h = '<div class="space-y-2">';
+            db.walls.forEach(w => h += `<div class="app-card p-3 flex justify-between text-xs"><span>BANCO: <b>${w}</b></span><i onclick="delCfg('wall','${w}')" class="fas fa-trash text-rose-900"></i></div>`);
+            db.cats.forEach(c => h += `<div class="app-card p-3 flex justify-between text-xs"><span>CAT: <b>${c}</b></span><i onclick="delCfg('cat','${c}')" class="fas fa-trash text-rose-900"></i></div>`);
+            h += '</div>';
             document.getElementById('cfg-list').innerHTML = h;
             setup();
         }
@@ -349,18 +319,17 @@
             const wH = db.walls.map(w => `<option value="${w}">${w}</option>`).join('');
             document.getElementById('v-wallet').innerHTML = wH;
             document.getElementById('g-wallet').innerHTML = wH;
-            document.getElementById('cfg-cat-sel').innerHTML = db.cats.map(c => `<option value="${c}">${c}</option>`).join('');
             document.getElementById('g-cat').innerHTML = db.cats.map(c => `<option value="${c}">${c}</option>`).join('');
             loadSubs();
         }
 
         function loadSubs() {
             const c = document.getElementById('g-cat').value;
-            document.getElementById('g-sub').innerHTML = (db.subs[c]||[]).map(s => `<option value="${s}">${s}</option>`).join('');
+            document.getElementById('g-sub').innerHTML = (db.subs[c]||['General']).map(s => `<option value="${s}">${s}</option>`).join('');
         }
 
-        function save() { localStorage.setItem('sm_v74', JSON.stringify(db)); }
-        function deshacer() { if(confirm("¿Borrar último registro?")) { db.movs.shift(); save(); nav('dash'); } }
+        function save() { localStorage.setItem('sm_v75', JSON.stringify(db)); }
+        function deshacer() { if(confirm("¿Borrar último?")) { db.movs.shift(); save(); nav('dash'); } }
 
         window.onload = () => nav('dash');
     </script>
